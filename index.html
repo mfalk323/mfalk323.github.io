@@ -994,44 +994,55 @@
         </div>
     </footer>
 
-    <script>
-        // Tab navigation functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            const navLinks = document.querySelectorAll('.nav-link');
-            const sections = document.querySelectorAll('.content-section');
-            
-            navLinks.forEach(link => {
-                link.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    
-                    // Remove active class from all links and sections
-                    navLinks.forEach(l => l.classList.remove('active'));
-                    sections.forEach(s => s.classList.remove('active'));
-                    
-                    // Add active class to clicked link
-                    this.classList.add('active');
-                    
-                    // Show corresponding section
-                    const targetSection = this.getAttribute('data-section');
-                    document.getElementById(targetSection).classList.add('active');
-                    
-                    // Scroll to top of content
-                    document.querySelector('.nav').scrollIntoView({ behavior: 'smooth' });
-                });
-            });
-        });
-
-        // Close banner functionality
-        function closeBanner() {
-            document.getElementById('announcementsBanner').style.display = 'none';
-        }
-
-        // Smooth scrolling for social links
-        document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
+<script>
+    // Tab navigation functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const navLinks = document.querySelectorAll('.nav-link');
+        const sections = document.querySelectorAll('.content-section');
+        
+        navLinks.forEach(link => {
             link.addEventListener('click', function(e) {
-                // Let email links work normally
+                // Skip PDF links - let them work normally
+                if (this.getAttribute('href').endsWith('.pdf')) {
+                    return; // Don't prevent default for PDF links
+                }
+                
+                // Only prevent default for section navigation links
+                const targetSection = this.getAttribute('data-section');
+                if (!targetSection) {
+                    return; // If no data-section, let the link work normally
+                }
+                
+                e.preventDefault();
+                
+                // Remove active class from all links and sections
+                navLinks.forEach(l => l.classList.remove('active'));
+                sections.forEach(s => s.classList.remove('active'));
+                
+                // Add active class to clicked link
+                this.classList.add('active');
+                
+                // Show corresponding section
+                document.getElementById(targetSection).classList.add('active');
+                
+                // Scroll to top of content
+                document.querySelector('.nav').scrollIntoView({ behavior: 'smooth' });
             });
         });
-    </script>
+    });
+
+    // Close banner functionality
+    function closeBanner() {
+        document.getElementById('announcementsBanner').style.display = 'none';
+    }
+
+    // Smooth scrolling for social links
+    document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Let email links work normally
+        });
+    });
+</script>
+
 </body>
 </html>

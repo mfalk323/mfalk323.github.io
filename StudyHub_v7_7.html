@@ -1,0 +1,2548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Study Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Source+Sans+3:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAF7F2;
+    --bg-card: #FFFFFF;
+    --bg-warm: #F3EDE3;
+    --ink: #1A1A1A;
+    --ink-light: #555550;
+    --ink-muted: #8A8880;
+    --accent: #C45D3E;
+    --accent-light: rgba(196,93,62,0.1);
+    --green: #3A7D5C;
+    --green-light: rgba(58,125,92,0.1);
+    --green-border: rgba(58,125,92,0.3);
+    --red: #B84040;
+    --red-light: rgba(184,64,64,0.08);
+    --red-border: rgba(184,64,64,0.25);
+    --blue: #3B6BAA;
+    --blue-light: rgba(59,107,170,0.1);
+    --blue-border: rgba(59,107,170,0.3);
+    --border: #E5E0D5;
+    --border-dark: #C8C0B2;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { min-height: 100vh; background: var(--bg); color: var(--ink); font-family: 'Source Sans 3', sans-serif; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+  button:hover { filter: brightness(0.95); }
+  input:focus, textarea:focus, select:focus { border-color: var(--accent) !important; box-shadow: 0 0 0 3px rgba(196,93,62,0.1); outline: none; }
+  ::selection { background: rgba(196,93,62,0.2); }
+  select option { background: var(--bg-card); color: var(--ink); }
+  .bg-orb-1 { display: none; }
+  .bg-orb-2 { display: none; }
+  .header { padding: 20px 28px; border-bottom: 2px solid var(--ink); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; background: var(--bg); }
+  .logo { cursor: pointer; display: flex; align-items: center; gap: 12px; }
+  .logo-icon { display: none; }
+  .logo-text { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 900; letter-spacing: -0.5px; color: var(--ink); }
+  .container { max-width: 720px; margin: 0 auto; padding: 32px 20px 80px; }
+  .fade-in { animation: fadeIn 0.4s ease; }
+  .fade-in-fast { animation: fadeIn 0.3s ease; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* Badges */
+  .ch-badge { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; background: var(--bg-warm); color: var(--ink-light); border: 1px solid var(--border); }
+  /* Buttons */
+  .btn-primary { width: 100%; padding: 16px; border-radius: 0; border: 2px solid var(--ink); background: var(--ink); color: var(--bg); font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'Source Sans 3', sans-serif; letter-spacing: 0.5px; transition: all 0.2s; }
+  .btn-primary:hover { background: var(--accent); border-color: var(--accent); }
+  .btn-secondary { width: 100%; padding: 16px; border-radius: 0; border: 1.5px solid var(--border); background: transparent; color: var(--ink-light); font-size: 15px; font-weight: 700; cursor: pointer; font-family: 'Source Sans 3', sans-serif; transition: all 0.2s; }
+  .btn-secondary:hover { border-color: var(--ink); color: var(--ink); }
+  .btn-home { background: transparent; border: 1.5px solid var(--ink); color: var(--ink); padding: 8px 16px; border-radius: 0; cursor: pointer; font-size: 13px; font-family: 'Source Sans 3', sans-serif; font-weight: 600; letter-spacing: 0.5px; transition: all 0.2s; }
+  .btn-home:hover { background: var(--ink); color: var(--bg); }
+  .btn-disabled { background: var(--bg-warm) !important; color: var(--ink-muted) !important; cursor: not-allowed !important; border-color: var(--border) !important; }
+
+  /* Inputs */
+  .input { width: 100%; padding: 12px 16px; border-radius: 0; border: 1px solid var(--border); background: var(--bg-card); color: var(--ink); font-size: 14px; font-family: 'Source Sans 3', sans-serif; outline: none; box-sizing: border-box; }
+
+  /* Cards */
+  .card-btn { border-radius: 0; cursor: pointer; font-family: 'Source Sans 3', sans-serif; transition: all 0.25s; text-align: left; position: relative; border: none; width: 100%; color: var(--ink); }
+
+  /* Checkbox */
+  .checkbox { width: 20px; height: 20px; min-width: 20px; border-radius: 3px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; border: 2px solid var(--border-dark); background: transparent; color: var(--ink); }
+  .checkbox.checked { border-color: var(--accent); background: var(--accent); color: #fff; }
+  .checkbox.partial { border-color: var(--accent); background: rgba(196,93,62,0.3); }
+
+  /* Hide screens by default */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* Modal */
+  .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(26,26,26,0.5); backdrop-filter: blur(4px); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 20px; animation: fadeIn 0.2s ease; }
+  .modal { background: var(--bg-card); border: 2px solid var(--ink); padding: 28px; max-width: 420px; width: 100%; animation: scaleIn 0.25s ease; max-height: 85vh; overflow-y: auto; }
+  .modal h3 { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 800; margin: 0 0 16px; color: var(--ink); }
+
+  /* Class card hover */
+  .class-card { transition: transform 0.2s, box-shadow 0.2s; }
+  .class-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); }
+
+  /* Stagger animation */
+  .stagger-1 { animation: slideUp 0.4s ease 0.05s both; }
+  .stagger-2 { animation: slideUp 0.4s ease 0.1s both; }
+  .stagger-3 { animation: slideUp 0.4s ease 0.15s both; }
+  .stagger-4 { animation: slideUp 0.4s ease 0.2s both; }
+  .stagger-5 { animation: slideUp 0.4s ease 0.25s both; }
+  .stagger-6 { animation: slideUp 0.4s ease 0.3s both; }
+  .stagger-7 { animation: slideUp 0.4s ease 0.35s both; }
+  .stagger-8 { animation: slideUp 0.4s ease 0.4s both; }
+
+  /* Settings gear */
+  .settings-btn { background: transparent; border: 1.5px solid var(--ink); color: var(--ink); padding: 10px 20px; cursor: pointer; font-size: 13px; font-family: 'Source Sans 3', sans-serif; font-weight: 600; transition: all 0.2s; display: flex; align-items: center; gap: 6px; text-transform: uppercase; letter-spacing: 1.5px; }
+  .settings-btn:hover { background: var(--ink); color: var(--bg); }
+
+  /* Three-dot menu */
+  .menu-btn { background: none; border: none; color: var(--ink-muted); cursor: pointer; padding: 4px 8px; font-size: 18px; line-height: 1; border-radius: 0; transition: all 0.15s; }
+  .menu-btn:hover { background: var(--bg-warm); color: var(--ink); }
+  .dropdown-menu { position: absolute; top: 100%; right: 0; background: var(--bg-card); border: 1.5px solid var(--ink); padding: 6px; min-width: 160px; z-index: 50; animation: scaleIn 0.15s ease; box-shadow: 0 8px 24px rgba(0,0,0,0.1); }
+  .dropdown-item { display: block; width: 100%; padding: 10px 14px; border: none; background: none; color: var(--ink-light); font-size: 13px; font-weight: 500; cursor: pointer; border-radius: 0; text-align: left; font-family: 'Source Sans 3', sans-serif; }
+  .dropdown-item:hover { background: var(--bg-warm); color: var(--ink); }
+  .dropdown-item.danger { color: var(--red); }
+  .dropdown-item.danger:hover { background: var(--red-light); }
+
+  /* Rich text editor */
+  .rte-toolbar { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px; background: var(--bg-warm); border: 1px solid var(--border); border-bottom: none; }
+  .rte-btn { padding: 6px 10px; border: 1px solid var(--border); background: var(--bg-card); color: var(--ink-light); font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'Source Sans 3', sans-serif; line-height: 1; transition: all 0.15s; }
+  .rte-btn:hover { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+  .rte-btn.active { background: var(--accent-light); color: var(--accent); border-color: var(--accent); }
+  .rte-sep { width: 1px; background: var(--border); margin: 2px 4px; }
+  .rte-textarea { border-top: 1px solid var(--border) !important; min-height: 100px; }
+  .rte-preview { margin-top: 8px; padding: 12px 16px; background: var(--bg-warm); border: 1px solid var(--border); font-size: 14px; line-height: 1.5; color: var(--ink); min-height: 40px; }
+  .rte-preview:empty::before { content: 'Preview will appear here...'; color: var(--ink-muted); }
+  .rte-preview table { border-collapse: collapse; margin: 10px 0; font-family: inherit; width: 100%; max-width: 400px; }
+  .rte-preview td { padding: 4px 0; }
+
+  /* Table builder modal */
+  .table-builder-row { display: flex; gap: 6px; margin-bottom: 6px; }
+  .table-builder-row input { flex: 1; }
+
+  /* Journal Entry Styles */
+  .journal-wrap { background:var(--bg-card); border:1px solid var(--border); padding:16px; margin-bottom:8px; }
+  .journal-header { display:flex; align-items:center; gap:8px; margin-bottom:12px; }
+  .journal-header-label { font-size:13px; font-weight:700; color:var(--accent); text-transform:uppercase; letter-spacing:0.5px; font-family:'JetBrains Mono',monospace; }
+  .je-table { width:100%; border-collapse:collapse; }
+  .je-table th { padding:8px 6px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--ink-muted); border-bottom:2px solid var(--border); text-align:left; font-family:'JetBrains Mono',monospace; }
+  .je-table th.je-num { text-align:right; width:90px; }
+  .je-table td { padding:3px 3px; vertical-align:middle; }
+  .je-input { width:100%; padding:8px 10px; border-radius:0; border:1px solid var(--border); background:var(--bg-card); color:var(--ink); font-size:13px; font-family:'Source Sans 3',sans-serif; outline:none; box-sizing:border-box; transition:border-color 0.15s; }
+  .je-input:focus { border-color:var(--accent)!important; background:rgba(196,93,62,0.03); box-shadow:0 0 0 2px rgba(196,93,62,0.08); }
+  .je-input-num { text-align:right; font-family:'JetBrains Mono',monospace; font-weight:500; width:90px; }
+  .je-input-credit { padding-left:24px!important; }
+  .je-totals td { padding-top:8px!important; border-top:2px solid var(--border-dark); font-family:'JetBrains Mono',monospace; font-size:13px; font-weight:700; }
+  .je-balanced { color:var(--green); }
+  .je-unbalanced { color:var(--red); }
+  .je-remove { padding:4px 8px; border:1px solid var(--red-border); background:var(--red-light); color:var(--red); border-radius:0; cursor:pointer; font-size:11px; line-height:1; }
+  .je-add-row { margin-top:8px; padding:8px 14px; border-radius:0; border:1px solid var(--green-border); background:var(--green-light); color:var(--green); font-size:12px; font-weight:600; cursor:pointer; font-family:'Source Sans 3',sans-serif; }
+  .je-result { width:100%; border-collapse:collapse; font-size:13px; }
+  .je-result th { padding:6px 8px; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.5px; color:var(--ink-muted); border-bottom:1px solid var(--border); text-align:left; font-family:'JetBrains Mono',monospace; }
+  .je-result th.je-num { text-align:right; }
+  .je-result td { padding:4px 8px; color:var(--ink); }
+  .je-result td.je-num { text-align:right; font-family:'JetBrains Mono',monospace; }
+  .je-result .je-cr td:first-child { padding-left:20px; }
+  .je-row-correct { background:var(--green-light); }
+  .je-row-incorrect { background:var(--red-light); }
+</style>
+</head>
+<body>
+
+<div class="bg-orb-1"></div>
+<div class="bg-orb-2"></div>
+
+<!-- Header -->
+<div class="header">
+  <div class="logo" onclick="goToDashboard()">
+    <div class="logo-icon">S</div>
+    <div>
+      <div class="logo-text">Study Hub</div>
+    </div>
+  </div>
+  <div id="headerRight"></div>
+</div>
+
+<div class="container">
+  <!-- DASHBOARD (class list) -->
+  <div id="screen-dashboard" class="screen active">
+    <div class="fade-in" id="dashboardContent"></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="screen-settings" class="screen">
+    <div class="fade-in" id="settingsContent"></div>
+  </div>
+
+  <!-- CLASS HOME -->
+  <div id="screen-home" class="screen">
+    <div class="fade-in" id="homeContent"></div>
+  </div>
+
+  <!-- QUIZ BUILDER -->
+  <div id="screen-quiz-builder" class="screen">
+    <div class="fade-in" id="quizBuilderContent"></div>
+  </div>
+
+  <!-- TEST -->
+  <div id="screen-test" class="screen">
+    <div class="fade-in-fast" id="testContent"></div>
+  </div>
+
+  <!-- RESULTS -->
+  <div id="screen-results" class="screen">
+    <div class="fade-in" id="resultsContent"></div>
+  </div>
+
+  <!-- ANALYSIS -->
+  <div id="screen-analysis" class="screen">
+    <div class="fade-in" id="analysisContent"></div>
+  </div>
+
+  <!-- MANAGE QUESTIONS -->
+  <div id="screen-manage" class="screen">
+    <div class="fade-in" id="manageContent"></div>
+  </div>
+</div>
+
+<!-- Modal container -->
+<div id="modalContainer"></div>
+<div id="tableBuilderOverlay"></div>
+
+<script>
+/* ══════════════════════════════════════
+   STORAGE KEYS & DATA STRUCTURE
+   ══════════════════════════════════════
+   
+   localStorage keys:
+   - studyhub_classes: Array of class objects [{id, name, icon, color, questions:[...]}]
+   - studyhub_settings: {theme, ...}
+   - studyhub_progress_{classId}: {studied:[], missed:[]}
+*/
+
+const LETTERS = ["A","B","C","D","E","F"];
+
+const CLASS_COLORS = [
+  { gradient: "linear-gradient(135deg, #C45D3E, #A84830)", accent: "#C45D3E", light: "rgba(196,93,62,0.12)", text: "#C45D3E" },
+  { gradient: "linear-gradient(135deg, #3A7D5C, #2D6148)", accent: "#3A7D5C", light: "rgba(58,125,92,0.12)", text: "#3A7D5C" },
+  { gradient: "linear-gradient(135deg, #B8860B, #9A7009)", accent: "#B8860B", light: "rgba(184,134,11,0.12)", text: "#B8860B" },
+  { gradient: "linear-gradient(135deg, #8B5E3C, #6B4A2E)", accent: "#8B5E3C", light: "rgba(139,94,60,0.12)", text: "#8B5E3C" },
+  { gradient: "linear-gradient(135deg, #3B6BAA, #2D5488)", accent: "#3B6BAA", light: "rgba(59,107,170,0.12)", text: "#3B6BAA" },
+  { gradient: "linear-gradient(135deg, #7B5EA7, #604888)", accent: "#7B5EA7", light: "rgba(123,94,167,0.12)", text: "#7B5EA7" },
+  { gradient: "linear-gradient(135deg, #8A8A2E, #6E6E24)", accent: "#8A8A2E", light: "rgba(138,138,46,0.12)", text: "#8A8A2E" },
+  { gradient: "linear-gradient(135deg, #B84040, #963333)", accent: "#B84040", light: "rgba(184,64,64,0.12)", text: "#B84040" },
+];
+
+const CLASS_ICONS = ["📚","📖","📝","🧮","💼","🔬","🧪","📐","💻","🎓","📊","🏛️","⚖️","🩺","🎨","🌍","📡","🔢"];
+
+/* ══════════════════════════════════════
+   STATE
+   ══════════════════════════════════════ */
+let classes = JSON.parse(localStorage.getItem('studyhub_classes') || '[]');
+let settings = JSON.parse(localStorage.getItem('studyhub_settings') || '{}');
+
+// Fix any duplicate question IDs (can happen from bulk imports with reused IDs)
+(function deduplicateQuestionIds() {
+  let changed = false;
+  classes.forEach(cls => {
+    const seen = new Set();
+    (cls.questions || []).forEach(q => {
+      if (seen.has(q.id)) {
+        const oldId = q.id;
+        q.id = 'q_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+        changed = true;
+      }
+      seen.add(q.id);
+    });
+  });
+  if (changed) {
+    localStorage.setItem('studyhub_classes', JSON.stringify(classes));
+  }
+})();
+let currentClassId = null;
+let currentScreen = "dashboard";
+
+// Quiz/test state
+let quizChapters = [];
+let quizCount = 10;
+let quizNewOnly = false;
+let testQuestions = [];
+let testIdx = 0;
+let testSel = null;
+let testTxt = "";
+let testSubmitted = false;
+let testCorrect = false;
+let testDone = false;
+let score = {c:0, t:0};
+let analysisCh = "all";
+
+// Timing state
+let testStartTime = null;
+let questionStartTime = null;
+let questionTimes = [];
+
+// Journal entry state
+let journalRows = [];
+let modalJournalEntries = [];
+
+// Tracks questions seen in the current session — only committed to storage on test completion
+let pendingStudied = new Set();
+let pendingMissed = [];
+
+// Dropdown state
+let openDropdown = null;
+
+/* ══════════════════════════════════════
+   HELPERS
+   ══════════════════════════════════════ */
+function esc(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+
+function genId() {
+  return 'c_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+}
+
+function saveClasses() {
+  localStorage.setItem('studyhub_classes', JSON.stringify(classes));
+}
+
+function saveSettings() {
+  localStorage.setItem('studyhub_settings', JSON.stringify(settings));
+}
+
+function getProgress(classId) {
+  return JSON.parse(localStorage.getItem('studyhub_progress_' + classId) || '{"studied":[],"missed":[]}');
+}
+
+function saveProgress(classId, progress) {
+  localStorage.setItem('studyhub_progress_' + classId, JSON.stringify(progress));
+}
+
+function getSavedTest(classId) {
+  return JSON.parse(localStorage.getItem('studyhub_saved_test_' + classId) || 'null');
+}
+
+function saveTestState(classId) {
+  const state = {
+    testQuestions,
+    testIdx,
+    testSel,
+    testTxt,
+    testSubmitted,
+    testCorrect,
+    testDone,
+    score,
+    journalRows,
+    pendingStudied: Array.from(pendingStudied),
+    pendingMissed: pendingMissed,
+    testStartTime,
+    questionStartTime,
+    questionTimes,
+    savedAt: new Date().toISOString()
+  };
+  localStorage.setItem('studyhub_saved_test_' + classId, JSON.stringify(state));
+}
+
+function clearSavedTest(classId) {
+  localStorage.removeItem('studyhub_saved_test_' + classId);
+}
+
+function getCurrentClass() {
+  return classes.find(c => c.id === currentClassId);
+}
+
+function getCurrentQuestions() {
+  const cls = getCurrentClass();
+  return cls ? cls.questions || [] : [];
+}
+
+function getClassColor(cls) {
+  const idx = (cls.colorIdx !== undefined) ? cls.colorIdx : 0;
+  return CLASS_COLORS[idx % CLASS_COLORS.length];
+}
+
+function showScreen(s) {
+  document.querySelectorAll('.screen').forEach(x => x.classList.remove('active'));
+  document.getElementById('screen-'+s).classList.add('active');
+  currentScreen = s;
+  closeDropdowns();
+}
+
+function updateHeader(showBack, backTarget) {
+  if (showBack) {
+    const target = backTarget || 'goToDashboard()';
+    document.getElementById('headerRight').innerHTML = `<button class="btn-home" onclick="${target}">← Back</button>`;
+  } else {
+    document.getElementById('headerRight').innerHTML = '';
+  }
+}
+
+function closeDropdowns() {
+  openDropdown = null;
+  document.querySelectorAll('.dropdown-menu').forEach(d => d.remove());
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.menu-btn') && !e.target.closest('.dropdown-menu')) {
+    closeDropdowns();
+  }
+});
+
+function chBadge(ch) {
+  return `<span class="ch-badge">Ch. ${ch}</span>`;
+}
+
+function getChapters(questions) {
+  const s = new Set();
+  questions.forEach(q => s.add(q.chapter));
+  return Array.from(s).sort((a,b) => a-b);
+}
+
+function parseMoney(str) {
+  if (!str) return 0;
+  return parseFloat(String(str).replace(/[,$\s]/g, '')) || 0;
+}
+
+function fmtMoney(val) {
+  const n = parseFloat(val);
+  if (!n) return '';
+  return n.toLocaleString('en-US');
+}
+
+function questionTypeLabel(t) {
+  if (t === 'mc') return 'Multiple Choice';
+  if (t === 'journal') return 'Journal Entry';
+  return 'Fill in the Blank';
+}
+
+/* ══════════════════════════════════════
+   MODALS
+   ══════════════════════════════════════ */
+function showModal(html) {
+  document.getElementById('modalContainer').innerHTML = `
+    <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+      <div class="modal">
+        <button onclick="closeModal()" style="position:sticky;top:0;float:right;background:none;border:none;color:#8A8880;font-size:20px;cursor:pointer;padding:0 0 8px 8px;line-height:1;z-index:1" title="Close (Esc)">✕</button>
+        <div style="clear:both"></div>
+        ${html}
+      </div>
+    </div>`;
+}
+
+function closeModal() {
+  document.getElementById('modalContainer').innerHTML = '';
+}
+
+// Close modal on Escape
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const tbOverlay = document.getElementById('tableBuilderOverlay');
+    if (tbOverlay && tbOverlay.innerHTML) { closeTableBuilder(); return; }
+    if (document.querySelector('.modal-overlay')) { closeModal(); }
+  }
+});
+
+/* ══════════════════════════════════════
+   DASHBOARD (Class List)
+   ══════════════════════════════════════ */
+function goToDashboard() {
+  currentClassId = null;
+  updateHeader(false);
+  renderDashboard();
+  showScreen("dashboard");
+}
+
+function renderDashboard() {
+  const activeClasses = classes.filter(c => !c.archived);
+  let html = `
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px">
+      <div>
+        <h1 style="font-family:'Playfair Display',serif;font-size:36px;font-weight:900;margin:0 0 4px;letter-spacing:-0.5px">My Classes</h1>
+        <p style="color:#8A8880;font-size:15px;margin:0">${activeClasses.length} class${activeClasses.length !== 1 ? 'es' : ''}</p>
+      </div>
+      <button class="settings-btn" onclick="openSettings()">
+        Settings
+      </button>
+    </div>`;
+
+  if (activeClasses.length === 0) {
+    html += `
+      <div class="stagger-1" style="text-align:center;padding:60px 20px;background:#FFFFFF;border-radius:0;border:1px solid #E5E0D5;margin-bottom:20px">
+        <div style="font-size:48px;margin-bottom:16px">📚</div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin:0 0 8px">No classes yet</h3>
+        <p style="color:#8A8880;font-size:14px;margin:0 0 24px">Go to Settings to add your first class</p>
+        <button class="btn-primary" style="max-width:280px;margin:0 auto" onclick="openSettings()">Open Settings</button>
+      </div>`;
+  } else {
+    html += `<div style="display:grid;gap:12px;margin-bottom:24px">`;
+    activeClasses.forEach((cls, i) => {
+      const color = getClassColor(cls);
+      const progress = getProgress(cls.id);
+      const qCount = (cls.questions || []).length;
+      const qIds = new Set((cls.questions || []).map(q => q.id));
+      const studiedCount = (progress.studied || []).filter(id => qIds.has(id)).length;
+      const missedCount = (progress.missed || []).length;
+      const pct = qCount > 0 ? Math.round((studiedCount / qCount) * 100) : 0;
+      const stagger = Math.min(i + 1, 8);
+
+      html += `
+        <div class="class-card stagger-${stagger}" style="background:#FFFFFF;border:1px solid #E5E0D5;border-radius:0;padding:20px 24px;position:relative;cursor:pointer" onclick="openClass('${cls.id}')">
+          <div style="position:absolute;top:12px;right:12px">
+            <button class="menu-btn" onclick="event.stopPropagation();toggleClassMenu('${cls.id}',this)" title="Options">⋮</button>
+          </div>
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px">
+            <div style="width:48px;height:48px;border-radius:0;background:${color.gradient};display:flex;align-items:center;justify-content:center;font-size:22px">${cls.icon || '📚'}</div>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:17px;font-weight:700;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-right:24px">${esc(cls.name)}</div>
+              <div style="font-size:13px;color:#8A8880">${qCount} question${qCount !== 1 ? 's' : ''}${missedCount > 0 ? ` · <span style="color:#C45D3E">${missedCount} missed</span>` : ''}</div>
+            </div>
+          </div>
+          ${qCount > 0 ? `
+          <div style="height:6px;background:#E5E0D5;border-radius:3px;overflow:hidden">
+            <div style="height:100%;background:${color.gradient};width:${pct}%;transition:width 0.5s"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:6px">
+            <span style="font-size:11px;color:#8A8880">Progress</span>
+            <span class="mono" style="font-size:11px;color:${color.text}">${pct}%</span>
+          </div>` : `
+          <div style="font-size:12px;color:#8A8880;font-style:italic">No questions added yet</div>`}
+        </div>`;
+    });
+    html += `</div>`;
+
+    // Add New Class button moved to Settings
+  }
+
+  document.getElementById('dashboardContent').innerHTML = html;
+}
+
+function toggleClassMenu(classId, btnEl) {
+  // Close existing
+  const existing = document.querySelector('.dropdown-menu');
+  if (existing) { existing.remove(); if (openDropdown === classId) { openDropdown = null; return; } }
+  
+  openDropdown = classId;
+  const rect = btnEl.getBoundingClientRect();
+  const menu = document.createElement('div');
+  menu.className = 'dropdown-menu';
+  menu.style.position = 'fixed';
+  menu.style.top = (rect.bottom + 4) + 'px';
+  menu.style.right = (window.innerWidth - rect.right) + 'px';
+  menu.innerHTML = `
+    <button class="dropdown-item" onclick="showEditClassModal('${classId}')">✏️ &nbsp;Rename Class</button>
+    <button class="dropdown-item" onclick="showChangeIconModal('${classId}')">🎨 &nbsp;Change Icon & Color</button>
+    <button class="dropdown-item" onclick="duplicateClass('${classId}')">📋 &nbsp;Duplicate Class</button>
+    <button class="dropdown-item" onclick="archiveClass('${classId}')">📦 &nbsp;Archive Class</button>
+    <button class="dropdown-item danger" onclick="showDeleteClassModal('${classId}')">🗑️ &nbsp;Delete Class</button>
+  `;
+  document.body.appendChild(menu);
+}
+
+/* ══════════════════════════════════════
+   ADD CLASS MODAL
+   ══════════════════════════════════════ */
+function showAddClassModal() {
+  closeDropdowns();
+  const colorOptions = CLASS_COLORS.map((c, i) =>
+    `<button onclick="document.getElementById('newClassColor').value=${i};document.querySelectorAll('.color-pick').forEach(b=>b.style.outline='none');this.style.outline='2px solid #1A1A1A'" class="color-pick" style="width:32px;height:32px;border-radius:0;background:${c.gradient};border:none;cursor:pointer;${i===0?'outline:2px solid white':''}"></button>`
+  ).join('');
+  
+  const iconOptions = CLASS_ICONS.map(icon =>
+    `<button onclick="document.getElementById('newClassIcon').value='${icon}';document.querySelectorAll('.icon-pick').forEach(b=>b.style.outline='none');this.style.outline='2px solid #1A1A1A'" class="icon-pick" style="font-size:22px;padding:6px;background:none;border:none;cursor:pointer;border-radius:6px;${icon==='📚'?'outline:2px solid white':''}">${icon}</button>`
+  ).join('');
+
+  showModal(`
+    <h3>Add New Class</h3>
+    <input type="hidden" id="newClassColor" value="0">
+    <input type="hidden" id="newClassIcon" value="📚">
+    <div style="margin-bottom:16px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#8A8880;margin-bottom:8px">Class Name</label>
+      <input type="text" class="input" id="newClassName" placeholder="e.g. ACCT 341" autofocus>
+    </div>
+    <div style="margin-bottom:16px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#8A8880;margin-bottom:8px">Icon</label>
+      <div style="display:flex;flex-wrap:wrap;gap:4px">${iconOptions}</div>
+    </div>
+    <div style="margin-bottom:20px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#8A8880;margin-bottom:8px">Color</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">${colorOptions}</div>
+    </div>
+    <div style="display:grid;gap:10px">
+      <button class="btn-primary" onclick="addClass()">Create Class</button>
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  `);
+  setTimeout(() => document.getElementById('newClassName')?.focus(), 100);
+}
+
+function addClass() {
+  const name = document.getElementById('newClassName').value.trim();
+  if (!name) { alert('Please enter a class name'); return; }
+  
+  const colorIdx = parseInt(document.getElementById('newClassColor').value) || 0;
+  const icon = document.getElementById('newClassIcon').value || '📚';
+  
+  const newClass = {
+    id: genId(),
+    name: name,
+    icon: icon,
+    colorIdx: colorIdx,
+    questions: []
+  };
+  
+  classes.push(newClass);
+  saveClasses();
+  closeModal();
+  renderDashboard();
+}
+
+/* ══════════════════════════════════════
+   EDIT CLASS MODAL
+   ══════════════════════════════════════ */
+function showEditClassModal(classId) {
+  closeDropdowns();
+  const cls = classes.find(c => c.id === classId);
+  if (!cls) return;
+  
+  showModal(`
+    <h3>Rename Class</h3>
+    <div style="margin-bottom:20px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#8A8880;margin-bottom:8px">Class Name</label>
+      <input type="text" class="input" id="editClassName" value="${esc(cls.name)}" autofocus>
+    </div>
+    <div style="display:grid;gap:10px">
+      <button class="btn-primary" onclick="renameClass('${classId}')">Save</button>
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  `);
+  setTimeout(() => { const el = document.getElementById('editClassName'); el?.focus(); el?.select(); }, 100);
+}
+
+function renameClass(classId) {
+  const name = document.getElementById('editClassName').value.trim();
+  if (!name) { alert('Please enter a class name'); return; }
+  
+  const cls = classes.find(c => c.id === classId);
+  if (cls) {
+    cls.name = name;
+    saveClasses();
+  }
+  closeModal();
+  if (currentClassId === classId) {
+    const color = getClassColor(cls);
+    updateHeader(true, "goToDashboard()");
+  }
+  renderDashboard();
+}
+
+/* ══════════════════════════════════════
+   CHANGE ICON/COLOR MODAL
+   ══════════════════════════════════════ */
+function showChangeIconModal(classId) {
+  closeDropdowns();
+  const cls = classes.find(c => c.id === classId);
+  if (!cls) return;
+  
+  const colorOptions = CLASS_COLORS.map((c, i) =>
+    `<button onclick="document.getElementById('editClassColor').value=${i};document.querySelectorAll('.color-pick').forEach(b=>b.style.outline='none');this.style.outline='2px solid #1A1A1A'" class="color-pick" style="width:32px;height:32px;border-radius:0;background:${c.gradient};border:none;cursor:pointer;${cls.colorIdx===i?'outline:2px solid white':''}"></button>`
+  ).join('');
+  
+  const iconOptions = CLASS_ICONS.map(icon =>
+    `<button onclick="document.getElementById('editClassIcon').value='${icon}';document.querySelectorAll('.icon-pick').forEach(b=>b.style.outline='none');this.style.outline='2px solid #1A1A1A'" class="icon-pick" style="font-size:22px;padding:6px;background:none;border:none;cursor:pointer;border-radius:6px;${cls.icon===icon?'outline:2px solid white':''}">${icon}</button>`
+  ).join('');
+
+  showModal(`
+    <h3>Change Icon & Color</h3>
+    <input type="hidden" id="editClassColor" value="${cls.colorIdx || 0}">
+    <input type="hidden" id="editClassIcon" value="${cls.icon || '📚'}">
+    <div style="margin-bottom:16px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#8A8880;margin-bottom:8px">Icon</label>
+      <div style="display:flex;flex-wrap:wrap;gap:4px">${iconOptions}</div>
+    </div>
+    <div style="margin-bottom:20px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#8A8880;margin-bottom:8px">Color</label>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">${colorOptions}</div>
+    </div>
+    <div style="display:grid;gap:10px">
+      <button class="btn-primary" onclick="updateClassAppearance('${classId}')">Save</button>
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  `);
+}
+
+function updateClassAppearance(classId) {
+  const cls = classes.find(c => c.id === classId);
+  if (cls) {
+    cls.colorIdx = parseInt(document.getElementById('editClassColor').value) || 0;
+    cls.icon = document.getElementById('editClassIcon').value || '📚';
+    saveClasses();
+  }
+  closeModal();
+  renderDashboard();
+}
+
+/* ══════════════════════════════════════
+   DELETE CLASS MODAL
+   ══════════════════════════════════════ */
+function showDeleteClassModal(classId) {
+  closeDropdowns();
+  const cls = classes.find(c => c.id === classId);
+  if (!cls) return;
+  
+  showModal(`
+    <h3>Delete Class</h3>
+    <p style="color:#555550;font-size:14px;margin:0 0 8px">Are you sure you want to delete <strong style="color:#1A1A1A">${esc(cls.name)}</strong>?</p>
+    <p style="color:#B84040;font-size:13px;margin:0 0 20px">This will permanently delete all ${(cls.questions||[]).length} questions and your study progress for this class.</p>
+    <div style="display:grid;gap:10px">
+      <button style="width:100%;padding:16px;border-radius:0;border:1px solid rgba(184,64,64,0.3);background:rgba(184,64,64,0.12);color:#B84040;font-size:15px;font-weight:700;cursor:pointer;font-family:'Source Sans 3',sans-serif" onclick="deleteClass('${classId}')">Delete Class</button>
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  `);
+}
+
+function deleteClass(classId) {
+  classes = classes.filter(c => c.id !== classId);
+  saveClasses();
+  localStorage.removeItem('studyhub_progress_' + classId);
+  closeModal();
+  if (currentClassId === classId) {
+    goToDashboard();
+  } else {
+    renderDashboard();
+  }
+}
+
+function duplicateClass(classId) {
+  closeDropdowns();
+  const cls = classes.find(c => c.id === classId);
+  if (!cls) return;
+  
+  const newCls = {
+    id: genId(),
+    name: cls.name + ' (copy)',
+    icon: cls.icon,
+    colorIdx: cls.colorIdx,
+    questions: JSON.parse(JSON.stringify(cls.questions || []))
+  };
+  classes.push(newCls);
+  saveClasses();
+  renderDashboard();
+}
+
+/* ══════════════════════════════════════
+   ARCHIVE / UNARCHIVE CLASS
+   ══════════════════════════════════════ */
+function archiveClass(classId) {
+  closeDropdowns();
+  const cls = classes.find(c => c.id === classId);
+  if (!cls) return;
+  cls.archived = true;
+  saveClasses();
+  if (currentClassId === classId) {
+    goToDashboard();
+  } else {
+    renderDashboard();
+  }
+}
+
+function unarchiveClass(classId) {
+  const cls = classes.find(c => c.id === classId);
+  if (!cls) return;
+  cls.archived = false;
+  saveClasses();
+  renderSettings();
+}
+
+function deleteArchivedClass(classId) {
+  const cls = classes.find(c => c.id === classId);
+  if (!cls) return;
+  if (!confirm(`Permanently delete "${cls.name}" and all its data? This cannot be undone.`)) return;
+  classes = classes.filter(c => c.id !== classId);
+  saveClasses();
+  localStorage.removeItem('studyhub_progress_' + classId);
+  renderSettings();
+}
+
+/* ══════════════════════════════════════
+   SETTINGS
+   ══════════════════════════════════════ */
+function openSettings() {
+  updateHeader(true, 'goToDashboard()');
+  renderSettings();
+  showScreen("settings");
+}
+
+function renderSettings() {
+  const archivedClasses = classes.filter(c => c.archived);
+  const activeClasses = classes.filter(c => !c.archived);
+
+  let html = `
+    <h2 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:800;margin:0 0 24px">Settings</h2>
+    
+    <div style="background:#FFFFFF;border:1px solid #E5E0D5;border-radius:0;padding:20px 24px;margin-bottom:16px">
+      <h3 style="font-size:14px;font-weight:700;margin:0 0 16px;color:#8A8880;text-transform:uppercase;letter-spacing:1px">Classes</h3>
+      <button onclick="showAddClassModal()" style="width:100%;padding:14px 18px;border-radius:0;border:2px solid #1A1A1A;background:#1A1A1A;color:#FAF7F2;font-size:14px;font-weight:700;cursor:pointer;font-family:'Source Sans 3',sans-serif;text-align:center;letter-spacing:0.5px;transition:all 0.2s">
+        + Add New Class
+      </button>
+    </div>`;
+
+  // Reorder section — only show when 2+ active classes
+  if (activeClasses.length > 1) {
+    html += `
+    <div style="background:#FFFFFF;border:1px solid #E5E0D5;border-radius:0;padding:20px 24px;margin-bottom:16px">
+      <h3 style="font-size:14px;font-weight:700;margin:0 0 6px;color:#8A8880;text-transform:uppercase;letter-spacing:1px">Reorder Classes</h3>
+      <p style="color:#8A8880;font-size:12px;margin:0 0 16px">Drag to reorder how classes appear on your dashboard</p>
+      <div id="reorderList" style="display:grid;gap:6px">`;
+
+    activeClasses.forEach(cls => {
+      const color = getClassColor(cls);
+      html += `
+        <div class="reorder-item" draggable="true" data-id="${cls.id}" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #E5E0D5;background:#FFFFFF;cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;transition:border-color 0.15s, box-shadow 0.15s">
+          <span style="color:#C8C0B2;font-size:16px;flex-shrink:0;line-height:1;cursor:grab">☰</span>
+          <div style="width:32px;height:32px;border-radius:0;background:${color.gradient};display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0">${cls.icon || '📚'}</div>
+          <div style="flex:1;min-width:0;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(cls.name)}</div>
+        </div>`;
+    });
+
+    html += `
+      </div>
+    </div>`;
+  }
+
+  html += `
+    <div style="background:#FFFFFF;border:1px solid #E5E0D5;border-radius:0;padding:20px 24px;margin-bottom:16px">
+      <h3 style="font-size:14px;font-weight:700;margin:0 0 16px;color:#8A8880;text-transform:uppercase;letter-spacing:1px">Archived Classes</h3>`;
+
+  if (archivedClasses.length === 0) {
+    html += `<p style="color:#8A8880;font-size:13px;margin:0">No archived classes. You can archive a class from the ⋮ menu on the dashboard.</p>`;
+  } else {
+    html += `<div style="display:grid;gap:10px">`;
+    archivedClasses.forEach(cls => {
+      const color = getClassColor(cls);
+      const qCount = (cls.questions || []).length;
+      html += `
+        <div style="border:1px solid #E5E0D5;padding:14px 18px;display:flex;align-items:center;gap:14px">
+          <div style="width:40px;height:40px;border-radius:0;background:${color.gradient};display:flex;align-items:center;justify-content:center;font-size:18px;opacity:0.6">${cls.icon || '📚'}</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(cls.name)}</div>
+            <div style="font-size:12px;color:#8A8880">${qCount} question${qCount !== 1 ? 's' : ''}</div>
+          </div>
+          <div style="display:flex;gap:6px;flex-shrink:0">
+            <button onclick="unarchiveClass('${cls.id}')" style="padding:6px 12px;border:1px solid rgba(58,125,92,0.3);background:rgba(58,125,92,0.08);color:#3A7D5C;font-size:11px;font-weight:700;cursor:pointer;font-family:'Source Sans 3',sans-serif" title="Restore">Restore</button>
+            <button onclick="deleteArchivedClass('${cls.id}')" style="padding:6px 12px;border:1px solid rgba(184,64,64,0.25);background:rgba(184,64,64,0.06);color:#B84040;font-size:11px;font-weight:700;cursor:pointer;font-family:'Source Sans 3',sans-serif" title="Delete permanently">Delete</button>
+          </div>
+        </div>`;
+    });
+    html += `</div>`;
+  }
+
+  html += `
+    </div>
+
+    <div style="background:#FFFFFF;border:1px solid #E5E0D5;border-radius:0;padding:20px 24px;margin-bottom:16px">
+      <h3 style="font-size:14px;font-weight:700;margin:0 0 16px;color:#8A8880;text-transform:uppercase;letter-spacing:1px">Data Management</h3>
+      <div style="display:grid;gap:10px">
+        <button onclick="exportAllData()" style="padding:14px 18px;border-radius:0;border:1px solid rgba(59,107,170,0.3);background:rgba(59,107,170,0.1);color:#3B6BAA;font-size:13px;font-weight:600;cursor:pointer;font-family:'Source Sans 3',sans-serif;text-align:left;display:flex;align-items:center;gap:10px">
+          <span style="font-size:18px">📥</span>
+          <div>
+            <div style="font-weight:700">Export All Data</div>
+            <div style="font-size:11px;color:#3B6BAA;margin-top:2px">Download all classes, questions & progress</div>
+          </div>
+        </button>
+        <button onclick="importAllData()" style="padding:14px 18px;border-radius:0;border:1px solid rgba(58,125,92,0.3);background:rgba(58,125,92,0.1);color:#3A7D5C;font-size:13px;font-weight:600;cursor:pointer;font-family:'Source Sans 3',sans-serif;text-align:left;display:flex;align-items:center;gap:10px">
+          <span style="font-size:18px">📤</span>
+          <div>
+            <div style="font-weight:700">Import Data</div>
+            <div style="font-size:11px;color:#3A7D5C;margin-top:2px">Restore from a backup file</div>
+          </div>
+        </button>
+      </div>
+    </div>
+    
+    <div style="background:#FFFFFF;border:1px solid #E5E0D5;border-radius:0;padding:20px 24px;margin-bottom:16px">
+      <h3 style="font-size:14px;font-weight:700;margin:0 0 16px;color:#8A8880;text-transform:uppercase;letter-spacing:1px">Danger Zone</h3>
+      <button onclick="resetAllData()" style="width:100%;padding:14px 18px;border-radius:0;border:1px solid rgba(184,64,64,0.25);background:rgba(184,64,64,0.06);color:#B84040;font-size:13px;font-weight:600;cursor:pointer;font-family:'Source Sans 3',sans-serif;text-align:left">
+        🗑️ &nbsp;Reset All Data — Delete all classes and progress
+      </button>
+    </div>
+
+    <div style="background:#FFFFFF;border:1px solid #E5E0D5;border-radius:0;padding:20px 24px">
+      <h3 style="font-size:14px;font-weight:700;margin:0 0 12px;color:#8A8880;text-transform:uppercase;letter-spacing:1px">About</h3>
+      <p style="color:#8A8880;font-size:13px;margin:0;line-height:1.6">Study Hub is a local study tool that stores all data in your browser's localStorage. No account needed — your data stays on your device.</p>
+    </div>
+    
+    <button class="btn-secondary" style="margin-top:20px" onclick="goToDashboard()">Back to Dashboard</button>`;
+
+  document.getElementById('settingsContent').innerHTML = html;
+
+  // Initialize drag-and-drop after DOM is updated
+  if (activeClasses.length > 1) initReorderDragDrop();
+}
+
+/* ══════════════════════════════════════
+   DRAG-AND-DROP REORDER
+   ══════════════════════════════════════ */
+function initReorderDragDrop() {
+  const list = document.getElementById('reorderList');
+  if (!list) return;
+
+  let dragItem = null;
+  let dragPlaceholder = null;
+  let touchOffsetY = 0;
+  let touchClone = null;
+
+  // --- Desktop drag events ---
+  list.addEventListener('dragstart', e => {
+    const item = e.target.closest('.reorder-item');
+    if (!item) return;
+    dragItem = item;
+    item.style.opacity = '0.4';
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', '');
+  });
+
+  list.addEventListener('dragend', e => {
+    const item = e.target.closest('.reorder-item');
+    if (item) item.style.opacity = '1';
+    list.querySelectorAll('.reorder-item').forEach(el => {
+      el.style.borderTop = '';
+      el.style.borderBottom = '';
+    });
+    if (dragItem) commitReorder();
+    dragItem = null;
+  });
+
+  list.addEventListener('dragover', e => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+    const target = e.target.closest('.reorder-item');
+    if (!target || target === dragItem) return;
+
+    // Clear all indicators
+    list.querySelectorAll('.reorder-item').forEach(el => {
+      el.style.borderTop = '';
+      el.style.borderBottom = '';
+    });
+
+    const rect = target.getBoundingClientRect();
+    const midY = rect.top + rect.height / 2;
+    if (e.clientY < midY) {
+      target.style.borderTop = '2px solid #C45D3E';
+    } else {
+      target.style.borderBottom = '2px solid #C45D3E';
+    }
+  });
+
+  list.addEventListener('drop', e => {
+    e.preventDefault();
+    const target = e.target.closest('.reorder-item');
+    if (!target || !dragItem || target === dragItem) return;
+
+    const rect = target.getBoundingClientRect();
+    const midY = rect.top + rect.height / 2;
+    if (e.clientY < midY) {
+      list.insertBefore(dragItem, target);
+    } else {
+      list.insertBefore(dragItem, target.nextSibling);
+    }
+  });
+
+  // --- Touch events (iPad / mobile) ---
+  list.addEventListener('touchstart', e => {
+    const item = e.target.closest('.reorder-item');
+    if (!item) return;
+
+    // Start a long-press timer to initiate drag
+    const touch = e.touches[0];
+    const startX = touch.clientX;
+    const startY = touch.clientY;
+    let moved = false;
+
+    dragItem = item;
+    const rect = item.getBoundingClientRect();
+    touchOffsetY = touch.clientY - rect.top;
+
+    // Create floating clone
+    touchClone = item.cloneNode(true);
+    touchClone.style.position = 'fixed';
+    touchClone.style.left = rect.left + 'px';
+    touchClone.style.top = rect.top + 'px';
+    touchClone.style.width = rect.width + 'px';
+    touchClone.style.zIndex = '999';
+    touchClone.style.opacity = '0.9';
+    touchClone.style.boxShadow = '0 6px 20px rgba(0,0,0,0.15)';
+    touchClone.style.borderColor = '#C45D3E';
+    touchClone.style.pointerEvents = 'none';
+    touchClone.style.display = 'none'; // Only show once movement starts
+
+    document.body.appendChild(touchClone);
+    item.style.opacity = '0.3';
+  }, { passive: false });
+
+  list.addEventListener('touchmove', e => {
+    if (!dragItem || !touchClone) return;
+    e.preventDefault();
+
+    const touch = e.touches[0];
+
+    // Show clone and start visual drag
+    touchClone.style.display = '';
+    touchClone.style.top = (touch.clientY - touchOffsetY) + 'px';
+
+    // Find which item we're over
+    list.querySelectorAll('.reorder-item').forEach(el => {
+      el.style.borderTop = '';
+      el.style.borderBottom = '';
+    });
+
+    const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+    const target = elemBelow ? elemBelow.closest('.reorder-item') : null;
+    if (target && target !== dragItem && list.contains(target)) {
+      const rect = target.getBoundingClientRect();
+      const midY = rect.top + rect.height / 2;
+      if (touch.clientY < midY) {
+        target.style.borderTop = '2px solid #C45D3E';
+      } else {
+        target.style.borderBottom = '2px solid #C45D3E';
+      }
+    }
+  }, { passive: false });
+
+  list.addEventListener('touchend', e => {
+    if (!dragItem) return;
+
+    // Find drop target
+    const touch = e.changedTouches[0];
+    if (touchClone) {
+      touchClone.style.display = 'none'; // hide clone so elementFromPoint can find the item below
+    }
+    const elemBelow = document.elementFromPoint(touch.clientX, touch.clientY);
+    const target = elemBelow ? elemBelow.closest('.reorder-item') : null;
+
+    if (target && target !== dragItem && list.contains(target)) {
+      const rect = target.getBoundingClientRect();
+      const midY = rect.top + rect.height / 2;
+      if (touch.clientY < midY) {
+        list.insertBefore(dragItem, target);
+      } else {
+        list.insertBefore(dragItem, target.nextSibling);
+      }
+    }
+
+    // Clean up
+    dragItem.style.opacity = '1';
+    list.querySelectorAll('.reorder-item').forEach(el => {
+      el.style.borderTop = '';
+      el.style.borderBottom = '';
+    });
+    if (touchClone) { touchClone.remove(); touchClone = null; }
+    commitReorder();
+    dragItem = null;
+  });
+
+  function commitReorder() {
+    const newOrder = Array.from(list.querySelectorAll('.reorder-item')).map(el => el.dataset.id);
+    // Rebuild the classes array: reordered active classes first, then archived in original order
+    const activeMap = {};
+    classes.filter(c => !c.archived).forEach(c => activeMap[c.id] = c);
+    const archived = classes.filter(c => c.archived);
+    const reordered = newOrder.map(id => activeMap[id]).filter(Boolean);
+    classes = [...reordered, ...archived];
+    saveClasses();
+  }
+}
+
+function exportAllData() {
+  const data = { classes: classes, settings: settings, progress: {} };
+  classes.forEach(cls => {
+    data.progress[cls.id] = getProgress(cls.id);
+  });
+  data.exportDate = new Date().toISOString();
+  data.version = 2;
+  
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'studyhub_backup_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importAllData() {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = event => {
+      try {
+        const data = JSON.parse(event.target.result);
+        
+        if (data.version === 2 && data.classes) {
+          // New format
+          classes = data.classes;
+          settings = data.settings || {};
+          
+          // Deduplicate question IDs
+          classes.forEach(cls => {
+            const seen = new Set();
+            (cls.questions || []).forEach(q => {
+              if (seen.has(q.id)) {
+                q.id = 'q_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+              }
+              seen.add(q.id);
+            });
+          });
+          
+          saveClasses();
+          saveSettings();
+          
+          if (data.progress) {
+            Object.keys(data.progress).forEach(classId => {
+              saveProgress(classId, data.progress[classId]);
+            });
+          }
+        } else if (data.studied || data.missed) {
+          // Old single-class format — import as new class
+          const newCls = {
+            id: genId(),
+            name: 'Imported Class',
+            icon: '📖',
+            colorIdx: 0,
+            questions: []
+          };
+          classes.push(newCls);
+          saveClasses();
+          saveProgress(newCls.id, { studied: data.studied || [], missed: data.missed || [] });
+          alert('Imported as a new class. You may want to rename it and add questions.');
+        } else {
+          alert('Unrecognized file format.');
+          return;
+        }
+        
+        alert('Data imported successfully!');
+        goToDashboard();
+      } catch (err) {
+        alert('Error importing file. Please make sure you selected the correct backup file.');
+      }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function resetAllData() {
+  if (!confirm('Are you sure you want to delete ALL classes and progress? This cannot be undone.')) return;
+  if (!confirm('This is your last chance. All data will be permanently deleted.')) return;
+  
+  classes.forEach(cls => localStorage.removeItem('studyhub_progress_' + cls.id));
+  classes = [];
+  settings = {};
+  saveClasses();
+  saveSettings();
+  goToDashboard();
+}
+
+/* ══════════════════════════════════════
+   CLASS HOME
+   ══════════════════════════════════════ */
+function openClass(classId) {
+  currentClassId = classId;
+  const cls = getCurrentClass();
+  if (!cls) { goToDashboard(); return; }
+  
+  updateHeader(true, 'goToDashboard()');
+  renderHome();
+  showScreen("home");
+}
+
+function renderHome() {
+  const cls = getCurrentClass();
+  if (!cls) return;
+  
+  const allQ = getCurrentQuestions();
+  const progress = getProgress(cls.id);
+  const qIds = new Set(allQ.map(q => q.id));
+  const studied = new Set((progress.studied || []).filter(id => qIds.has(id)));
+  const missed = progress.missed || [];
+  const totalQ = allQ.length;
+  const studiedCount = studied.size;
+  const studiedPct = totalQ > 0 ? Math.round((studiedCount / totalQ) * 100) : 0;
+  const color = getClassColor(cls);
+
+  let html = `
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px">
+      <div>
+        <h1 style="font-family:'Playfair Display',serif;font-size:32px;font-weight:900;margin:0 0 8px;letter-spacing:-0.5px">${esc(cls.name)}</h1>
+        <p style="color:#8A8880;font-size:15px;margin:0">${totalQ} Question${totalQ !== 1 ? 's' : ''}</p>
+      </div>
+      <button class="settings-btn" style="flex-shrink:0;padding:8px 16px;font-size:12px" onclick="openClassOptions()">Options</button>
+    </div>`;
+
+  if (totalQ === 0) {
+    html += `
+      <div style="text-align:center;padding:60px 20px;background:#FFFFFF;border-radius:0;border:1px solid #E5E0D5;margin-bottom:20px">
+        <div style="font-size:48px;margin-bottom:16px">📝</div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin:0 0 8px">No questions yet</h3>
+        <p style="color:#8A8880;font-size:14px;margin:0 0 24px">Add questions to start studying</p>
+        <button class="btn-primary" style="max-width:280px;margin:0 auto" onclick="openManageQuestions()">+ Add Questions</button>
+      </div>
+      <button class="btn-secondary" onclick="goToDashboard()">Back to Dashboard</button>`;
+    document.getElementById('homeContent').innerHTML = html;
+    return;
+  }
+
+  const saved = getSavedTest(cls.id);
+  let resumeCardHtml = '';
+  if (saved) {
+    const savedDate = new Date(saved.savedAt);
+    const timeStr = savedDate.toLocaleDateString('en-US', {month:'short', day:'numeric'}) + ' at ' + savedDate.toLocaleTimeString('en-US', {hour:'numeric', minute:'2-digit'});
+    const resumePct = Math.round((saved.testIdx / saved.testQuestions.length) * 100);
+    resumeCardHtml = `
+      <button class="card-btn" style="background:rgba(59,107,170,0.08);border:1px solid rgba(59,107,170,0.35);padding:20px 24px" onclick="resumeSavedTest()">
+        <div style="display:flex;align-items:center;gap:16px">
+          <div style="width:48px;height:48px;border-radius:0;background:linear-gradient(135deg,#C45D3E,#A84830);display:flex;align-items:center;justify-content:center;font-size:20px">▶️</div>
+          <div style="flex:1">
+            <div style="font-size:16px;font-weight:700;margin-bottom:2px;color:#3B6BAA">Resume Saved Test</div>
+            <div style="font-size:13px;color:#3B6BAA">Question ${saved.testIdx + 1} of ${saved.testQuestions.length} · ${resumePct}% done · Saved ${timeStr}</div>
+          </div>
+          <button onclick="event.stopPropagation();if(confirm('Delete saved test?')){clearSavedTest('${cls.id}');renderHome()}" style="padding:6px 10px;border-radius:6px;border:1px solid rgba(184,64,64,0.25);background:rgba(184,64,64,0.06);color:#B84040;font-size:11px;font-weight:600;cursor:pointer;font-family:'Source Sans 3',sans-serif;flex-shrink:0">\u2715</button>
+        </div>
+        <div style="margin-top:12px;height:4px;background:#E5E0D5;border-radius:2px;overflow:hidden">
+          <div style="height:100%;background:linear-gradient(90deg,#1A1A1A,#555550);width:${resumePct}%;transition:width 0.3s"></div>
+        </div>
+      </button>`;
+  }
+
+  html += `
+    <div style="background:#FFFFFF;border:1px solid #E5E0D5;border-radius:0;padding:20px 24px;margin-bottom:24px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <h3 style="font-size:14px;font-weight:700;margin:0;color:#8A8880;text-transform:uppercase;letter-spacing:1px">Study Progress</h3>
+        <span class="mono" style="font-size:14px;font-weight:700;color:${color.text}">${studiedCount}/${totalQ} (${studiedPct}%)</span>
+      </div>
+      <div style="height:8px;background:#E5E0D5;border-radius:0;overflow:hidden">
+        <div style="height:100%;background:${color.gradient};width:${studiedPct}%;transition:width 0.5s"></div>
+      </div>
+      <p style="color:#8A8880;font-size:13px;margin:8px 0 0">Questions you've practiced at least once</p>
+    </div>
+    
+    <div style="display:grid;gap:12px;margin-bottom:24px">
+      ${resumeCardHtml}
+      <button class="card-btn" style="background:#FFFFFF;border:1px solid #E5E0D5;padding:20px 24px" onclick="openQuizBuilder()">
+        <div style="display:flex;align-items:center;gap:16px">
+          <div style="width:48px;height:48px;border-radius:0;background:${color.gradient};display:flex;align-items:center;justify-content:center;font-size:20px">📝</div>
+          <div style="flex:1">
+            <div style="font-size:16px;font-weight:700;margin-bottom:2px">Quiz</div>
+            <div style="font-size:13px;color:#8A8880">Choose chapters & question count</div>
+          </div>
+        </div>
+      </button>
+      
+      ${missed.length > 0 ? `
+      <button class="card-btn" style="background:rgba(196,93,62,0.08);border:1px solid rgba(196,93,62,0.3);padding:20px 24px" onclick="openAnalysis()">
+        <div style="display:flex;align-items:center;gap:16px">
+          <div style="width:48px;height:48px;border-radius:0;background:rgba(196,93,62,0.12);display:flex;align-items:center;justify-content:center;font-size:20px">📊</div>
+          <div style="flex:1">
+            <div style="font-size:16px;font-weight:700;margin-bottom:2px;color:#C45D3E">Review Missed Questions</div>
+            <div style="font-size:13px;color:#8B5E3C">${missed.length} question${missed.length > 1 ? 's' : ''} to review</div>
+          </div>
+        </div>
+      </button>` : ''}
+    </div>
+    
+    <button class="btn-secondary" onclick="goToDashboard()">Back to Dashboard</button>`;
+
+  document.getElementById('homeContent').innerHTML = html;
+}
+
+/* ══════════════════════════════════════
+   CLASS OPTIONS PAGE
+   ══════════════════════════════════════ */
+function openClassOptions() {
+  updateHeader(true, `openClass('${currentClassId}')`);
+  renderClassOptions();
+  showScreen("settings"); // reuse settings screen container
+}
+
+function renderClassOptions() {
+  const cls = getCurrentClass();
+  if (!cls) return;
+  const allQ = getCurrentQuestions();
+  const progress = getProgress(cls.id);
+  const studiedCount = (progress.studied || []).filter(id => (cls.questions || []).some(q => q.id === id)).length;
+
+  let html = `
+    <h2 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:800;margin:0 0 4px">${esc(cls.name)}</h2>
+    <p style="color:#8A8880;font-size:14px;margin:0 0 24px">Class Options</p>
+
+    <div style="background:#FFFFFF;border:1px solid #E5E0D5;padding:20px 24px;margin-bottom:16px">
+      <h3 style="font-size:14px;font-weight:700;margin:0 0 16px;color:#8A8880;text-transform:uppercase;letter-spacing:1px">Questions</h3>
+      <div style="display:grid;gap:10px">
+        <button onclick="openManageQuestions()" style="width:100%;padding:14px 18px;border:1px solid #E5E0D5;background:#FFFFFF;color:#1A1A1A;font-size:14px;font-weight:600;cursor:pointer;font-family:'Source Sans 3',sans-serif;text-align:left;display:flex;align-items:center;gap:12px;transition:all 0.15s">
+          <span style="font-size:18px">✏️</span>
+          <div style="flex:1">
+            <div style="font-weight:700">Manage Questions</div>
+            <div style="font-size:12px;color:#8A8880;margin-top:2px">${allQ.length} question${allQ.length !== 1 ? 's' : ''} — add, edit, or remove</div>
+          </div>
+        </button>
+        <button onclick="showAddQuestionModal()" style="width:100%;padding:14px 18px;border:1px solid rgba(58,125,92,0.3);background:rgba(58,125,92,0.08);color:#3A7D5C;font-size:14px;font-weight:600;cursor:pointer;font-family:'Source Sans 3',sans-serif;text-align:left;display:flex;align-items:center;gap:12px;transition:all 0.15s">
+          <span style="font-size:18px">➕</span>
+          <div>
+            <div style="font-weight:700">Add Question</div>
+          </div>
+        </button>
+        <div style="display:flex;gap:10px">
+          <button onclick="showBulkImportModal()" style="flex:1;padding:12px;border:1px solid rgba(59,107,170,0.3);background:rgba(59,107,170,0.08);color:#3B6BAA;font-size:12px;font-weight:600;cursor:pointer;font-family:'Source Sans 3',sans-serif;text-align:center">📤 Bulk Import</button>
+          ${allQ.length > 0 ? `<button onclick="exportClassQuestions()" style="flex:1;padding:12px;border:1px solid rgba(59,107,170,0.3);background:rgba(59,107,170,0.08);color:#3B6BAA;font-size:12px;font-weight:600;cursor:pointer;font-family:'Source Sans 3',sans-serif;text-align:center">📥 Export</button>` : ''}
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#FFFFFF;border:1px solid #E5E0D5;padding:20px 24px;margin-bottom:16px">
+      <h3 style="font-size:14px;font-weight:700;margin:0 0 16px;color:#8A8880;text-transform:uppercase;letter-spacing:1px">Progress</h3>
+      <div style="display:grid;gap:10px">
+        ${studiedCount > 0 ? `
+        <button onclick="resetClassProgress()" style="width:100%;padding:14px 18px;border:1px solid rgba(184,64,64,0.25);background:rgba(184,64,64,0.06);color:#B84040;font-size:14px;font-weight:600;cursor:pointer;font-family:'Source Sans 3',sans-serif;text-align:left;display:flex;align-items:center;gap:12px">
+          <span style="font-size:18px">🔄</span>
+          <div>
+            <div style="font-weight:700">Reset Study Progress</div>
+            <div style="font-size:12px;color:#B84040;margin-top:2px;opacity:0.7">${studiedCount} question${studiedCount !== 1 ? 's' : ''} studied — reset to 0</div>
+          </div>
+        </button>` : `
+        <p style="color:#8A8880;font-size:13px;margin:0">No study progress to reset.</p>`}
+      </div>
+    </div>
+
+    <button class="btn-secondary" style="margin-top:8px" onclick="openClass('${currentClassId}')">Back to ${esc(cls.name)}</button>`;
+
+  document.getElementById('settingsContent').innerHTML = html;
+}
+
+function resetClassProgress() {
+  if (!confirm('Reset study progress for this class? This will clear which questions you\'ve studied.')) return;
+  saveProgress(currentClassId, { studied: [], missed: getProgress(currentClassId).missed });
+  renderClassOptions();
+}
+
+/* ══════════════════════════════════════
+   MANAGE QUESTIONS
+   ══════════════════════════════════════ */
+function openManageQuestions() {
+  const cls = getCurrentClass();
+  updateHeader(true, `openClass('${currentClassId}')`);
+  renderManageQuestions();
+  showScreen("manage");
+}
+
+function renderManageQuestions() {
+  const cls = getCurrentClass();
+  const allQ = getCurrentQuestions();
+  
+  let html = `
+    <h2 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:800;margin:0 0 4px">Manage Questions</h2>
+    <p style="color:#8A8880;font-size:14px;margin:0 0 20px">${allQ.length} question${allQ.length !== 1 ? 's' : ''} in ${esc(cls.name)}</p>
+    
+    <div style="display:grid;gap:10px;margin-bottom:20px">
+      <button class="btn-primary" onclick="showAddQuestionModal()">+ Add Question</button>
+      <div style="display:flex;gap:10px">
+        <button onclick="showBulkImportModal()" style="flex:1;padding:12px;border-radius:0;border:1px solid rgba(58,125,92,0.3);background:rgba(58,125,92,0.08);color:#3A7D5C;font-size:13px;font-weight:600;cursor:pointer;font-family:'Source Sans 3',sans-serif">📤 Bulk Import (JSON)</button>
+        ${allQ.length > 0 ? `<button onclick="exportClassQuestions()" style="flex:1;padding:12px;border-radius:0;border:1px solid rgba(59,107,170,0.3);background:rgba(59,107,170,0.08);color:#3B6BAA;font-size:13px;font-weight:600;cursor:pointer;font-family:'Source Sans 3',sans-serif">📥 Export Questions</button>` : ''}
+      </div>
+    </div>`;
+
+  if (allQ.length === 0) {
+    html += `
+      <div style="text-align:center;padding:40px 20px;background:#FFFFFF;border-radius:0;border:1px solid #E5E0D5">
+        <div style="font-size:36px;margin-bottom:12px">📋</div>
+        <p style="color:#8A8880;font-size:14px;margin:0">No questions yet. Add questions individually or use bulk import.</p>
+      </div>`;
+  } else {
+    html += `<div style="display:grid;gap:10px">`;
+    allQ.forEach((q, i) => {
+      const questionPreview = q.question.replace(/<[^>]*>/g, '').substring(0, 100);
+      html += `
+        <div style="background:#FFFFFF;border:1px solid #E5E0D5;border-radius:0;padding:14px 18px;position:relative">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px;flex-wrap:wrap">
+            ${chBadge(q.chapter)}
+            <span class="mono" style="font-size:10px;color:#8A8880">${questionTypeLabel(q.type)}</span>
+          </div>
+          <p style="font-size:13px;color:#555550;margin:0 0 10px;line-height:1.4">${esc(questionPreview)}${questionPreview.length >= 100 ? '...' : ''}</p>
+          <div style="display:flex;gap:8px">
+            <button onclick="showEditQuestionModal(${i})" style="padding:6px 12px;border-radius:6px;border:1px solid rgba(59,107,170,0.3);background:rgba(59,107,170,0.08);color:#3B6BAA;font-size:11px;font-weight:600;cursor:pointer;font-family:'Source Sans 3',sans-serif">Edit</button>
+            <button onclick="deleteQuestion(${i})" style="padding:6px 12px;border-radius:6px;border:1px solid rgba(184,64,64,0.25);background:rgba(184,64,64,0.06);color:#B84040;font-size:11px;font-weight:600;cursor:pointer;font-family:'Source Sans 3',sans-serif">Delete</button>
+          </div>
+        </div>`;
+    });
+    html += `</div>`;
+  }
+
+  html += `<button class="btn-secondary" style="margin-top:20px" onclick="openClass('${currentClassId}')">Back to Class</button>`;
+  document.getElementById('manageContent').innerHTML = html;
+}
+
+/* ══════════════════════════════════════
+   ADD/EDIT QUESTION MODALS
+   ══════════════════════════════════════ */
+function showAddQuestionModal() {
+  modalJournalEntries = [
+    { account: '', debit: '', credit: '' },
+    { account: '', debit: '', credit: '' }
+  ];
+  showModal(`
+    <h3>Add Question</h3>
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#8A8880;margin-bottom:6px">Chapter</label>
+      <input type="number" class="input" id="qChapter" placeholder="e.g. 1" min="1">
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#8A8880;margin-bottom:6px">Question Type</label>
+      <select class="input" id="qType" onchange="toggleQuestionTypeFields()">
+        <option value="mc">Multiple Choice</option>
+        <option value="fitb">Fill in the Blank</option>
+        <option value="journal">Journal Entry</option>
+      </select>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#8A8880;margin-bottom:6px">Question</label>
+      <div class="rte-toolbar">
+        <button type="button" class="rte-btn" onclick="rteInsert('qQuestion','bold')" title="Bold"><strong>B</strong></button>
+        <button type="button" class="rte-btn" onclick="rteInsert('qQuestion','italic')" title="Italic"><em>I</em></button>
+        <button type="button" class="rte-btn" onclick="rteInsert('qQuestion','underline')" title="Underline"><u>U</u></button>
+        <div class="rte-sep"></div>
+        <button type="button" class="rte-btn" onclick="rteInsert('qQuestion','br')" title="Line Break">↵ Break</button>
+        <button type="button" class="rte-btn" onclick="rteInsert('qQuestion','spacer')" title="Blank Line">⬜ Spacer</button>
+        <div class="rte-sep"></div>
+        <button type="button" class="rte-btn" onclick="showTableBuilder('qQuestion')" title="Insert Table">📊 Table</button>
+        <button type="button" class="rte-btn" onclick="rteInsert('qQuestion','numberedList')" title="Numbered List">1. List</button>
+      </div>
+      <textarea class="input rte-textarea" id="qQuestion" rows="5" placeholder="Type your question here..." oninput="updatePreview('qQuestion','qPreview')"></textarea>
+      <div class="rte-preview" id="qPreview"></div>
+    </div>
+    <div id="mcFields">
+      <div style="margin-bottom:8px">
+        <label style="display:block;font-size:13px;font-weight:600;color:#8A8880;margin-bottom:6px">Options</label>
+        <div style="display:grid;gap:6px">
+          <input type="text" class="input" id="qOpt0" placeholder="A)">
+          <input type="text" class="input" id="qOpt1" placeholder="B)">
+          <input type="text" class="input" id="qOpt2" placeholder="C)">
+          <input type="text" class="input" id="qOpt3" placeholder="D)">
+        </div>
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="display:block;font-size:13px;font-weight:600;color:#8A8880;margin-bottom:6px">Correct Answer</label>
+        <select class="input" id="qCorrectMC">
+          <option value="0">A</option>
+          <option value="1">B</option>
+          <option value="2">C</option>
+          <option value="3">D</option>
+        </select>
+      </div>
+    </div>
+    <div id="fitbFields" style="display:none">
+      <div style="margin-bottom:6px">
+        <label style="display:block;font-size:13px;font-weight:600;color:#8A8880;margin-bottom:6px">Correct Answer</label>
+        <input type="text" class="input" id="qCorrectFitb" placeholder="e.g. opportunity cost">
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="display:block;font-size:13px;font-weight:600;color:#8A8880;margin-bottom:6px">Also Accept (optional, comma-separated)</label>
+        <input type="text" class="input" id="qAltAnswers" placeholder="e.g. Opportunity Cost, opp cost">
+        <p style="font-size:11px;color:#8A8880;margin:6px 0 0">Answers are not case-sensitive. Add alternate spellings or abbreviations here.</p>
+      </div>
+    </div>
+    <div id="journalFields" style="display:none">
+      <label style="display:block;font-size:13px;font-weight:600;color:#8A8880;margin-bottom:8px">Correct Journal Entry</label>
+      <p style="font-size:11px;color:#8A8880;margin:0 0 10px">Enter the correct debit and credit entries. Credit accounts will be indented automatically during the test.</p>
+      <div id="modalJournalRows"></div>
+      <button onclick="addModalJournalRow()" class="je-add-row">+ Add Row</button>
+      <div style="margin-bottom:12px"></div>
+    </div>
+    <div style="display:grid;gap:10px">
+      <button class="btn-primary" onclick="saveNewQuestion()">Add Question</button>
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  `);
+  renderModalJournalRows();
+}
+
+function toggleQuestionTypeFields() {
+  const type = document.getElementById('qType').value;
+  document.getElementById('mcFields').style.display = type === 'mc' ? 'block' : 'none';
+  document.getElementById('fitbFields').style.display = type === 'fitb' ? 'block' : 'none';
+  const jf = document.getElementById('journalFields');
+  if (jf) jf.style.display = type === 'journal' ? 'block' : 'none';
+}
+
+function renderModalJournalRows() {
+  const c = document.getElementById('modalJournalRows');
+  if (!c) return;
+  let h = `<table style="width:100%;border-collapse:collapse"><tr>
+    <th style="padding:6px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#8A8880;text-align:left;font-family:'JetBrains Mono',monospace;border-bottom:1px solid #E5E0D5">Account</th>
+    <th style="padding:6px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#8A8880;text-align:right;font-family:'JetBrains Mono',monospace;width:80px;border-bottom:1px solid #E5E0D5">Debit</th>
+    <th style="padding:6px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;color:#8A8880;text-align:right;font-family:'JetBrains Mono',monospace;width:80px;border-bottom:1px solid #E5E0D5">Credit</th>
+    <th style="width:30px;border-bottom:1px solid #E5E0D5"></th></tr>`;
+  modalJournalEntries.forEach((e, i) => {
+    h += `<tr>
+      <td style="padding:3px 2px"><input class="je-input" value="${esc(e.account)}" placeholder="Account name" oninput="modalJournalEntries[${i}].account=this.value"></td>
+      <td style="padding:3px 2px"><input class="je-input je-input-num" style="width:80px" value="${esc(String(e.debit||''))}" placeholder="0" oninput="modalJournalEntries[${i}].debit=this.value"></td>
+      <td style="padding:3px 2px"><input class="je-input je-input-num" style="width:80px" value="${esc(String(e.credit||''))}" placeholder="0" oninput="modalJournalEntries[${i}].credit=this.value"></td>
+      <td style="padding:3px 0">${modalJournalEntries.length>1?`<button onclick="modalJournalEntries.splice(${i},1);renderModalJournalRows()" class="je-remove">✕</button>`:''}</td></tr>`;
+  });
+  h += `</table>`;
+  c.innerHTML = h;
+}
+
+function addModalJournalRow() {
+  modalJournalEntries.push({ account:'', debit:'', credit:'' });
+  renderModalJournalRows();
+}
+
+function saveNewQuestion() {
+  const cls = getCurrentClass();
+  const type = document.getElementById('qType').value;
+  const chapter = parseInt(document.getElementById('qChapter').value) || 1;
+  const question = document.getElementById('qQuestion').value.trim();
+  
+  if (!question) { alert('Please enter a question'); return; }
+  
+  const q = {
+    id: 'q_' + Date.now().toString(36),
+    chapter: chapter,
+    question: question,
+    type: type
+  };
+  
+  if (type === 'mc') {
+    q.options = [
+      document.getElementById('qOpt0').value.trim(),
+      document.getElementById('qOpt1').value.trim(),
+      document.getElementById('qOpt2').value.trim(),
+      document.getElementById('qOpt3').value.trim()
+    ].filter(o => o);
+    if (q.options.length < 2) { alert('Please enter at least 2 options'); return; }
+    q.correct = parseInt(document.getElementById('qCorrectMC').value);
+  } else if (type === 'journal') {
+    const entries = modalJournalEntries.filter(e => e.account.trim());
+    if (entries.length < 1) { alert('Please enter at least one journal entry line'); return; }
+    const hasDebit = entries.some(e => parseMoney(e.debit) > 0);
+    const hasCredit = entries.some(e => parseMoney(e.credit) > 0);
+    if (!hasDebit || !hasCredit) { alert('Journal entry must have at least one debit and one credit'); return; }
+    q.journalEntries = entries.map(e => ({ account: e.account.trim(), debit: parseMoney(e.debit), credit: parseMoney(e.credit) }));
+  } else {
+    q.correct = document.getElementById('qCorrectFitb').value.trim();
+    if (!q.correct) { alert('Please enter the correct answer'); return; }
+    const alts = document.getElementById('qAltAnswers').value.trim();
+    if (alts) {
+      q.altAnswers = alts.split(',').map(a => a.trim()).filter(a => a);
+    }
+  }
+  
+  cls.questions.push(q);
+  saveClasses();
+  closeModal();
+  renderManageQuestions();
+}
+
+function showEditQuestionModal(idx) {
+  const cls = getCurrentClass();
+  const q = cls.questions[idx];
+  if (!q) return;
+  
+  const isMC = q.type === 'mc';
+  const isJournal = q.type === 'journal';
+  const isFitb = !isMC && !isJournal;
+
+  if (isJournal && q.journalEntries) {
+    modalJournalEntries = q.journalEntries.map(e => ({ account: e.account, debit: e.debit || '', credit: e.credit || '' }));
+  } else {
+    modalJournalEntries = [{ account:'', debit:'', credit:'' }, { account:'', debit:'', credit:'' }];
+  }
+  
+  showModal(`
+    <h3>Edit Question</h3>
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#8A8880;margin-bottom:6px">Chapter</label>
+      <input type="number" class="input" id="eqChapter" value="${q.chapter}" min="1">
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#8A8880;margin-bottom:6px">Type</label>
+      <div class="input" style="color:#8A8880;cursor:default">${questionTypeLabel(q.type)}</div>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#8A8880;margin-bottom:6px">Question</label>
+      <div class="rte-toolbar">
+        <button type="button" class="rte-btn" onclick="rteInsert('eqQuestion','bold')" title="Bold"><strong>B</strong></button>
+        <button type="button" class="rte-btn" onclick="rteInsert('eqQuestion','italic')" title="Italic"><em>I</em></button>
+        <button type="button" class="rte-btn" onclick="rteInsert('eqQuestion','underline')" title="Underline"><u>U</u></button>
+        <div class="rte-sep"></div>
+        <button type="button" class="rte-btn" onclick="rteInsert('eqQuestion','br')" title="Line Break">↵ Break</button>
+        <button type="button" class="rte-btn" onclick="rteInsert('eqQuestion','spacer')" title="Blank Line">⬜ Spacer</button>
+        <div class="rte-sep"></div>
+        <button type="button" class="rte-btn" onclick="showTableBuilder('eqQuestion')" title="Insert Table">📊 Table</button>
+        <button type="button" class="rte-btn" onclick="rteInsert('eqQuestion','numberedList')" title="Numbered List">1. List</button>
+      </div>
+      <textarea class="input rte-textarea" id="eqQuestion" rows="5" oninput="updatePreview('eqQuestion','eqPreview')">${esc(q.question)}</textarea>
+      <div class="rte-preview" id="eqPreview"></div>
+    </div>
+    ${isMC ? `
+    <div style="margin-bottom:8px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#8A8880;margin-bottom:6px">Options</label>
+      <div style="display:grid;gap:6px">
+        <input type="text" class="input" id="eqOpt0" value="${esc(q.options[0] || '')}">
+        <input type="text" class="input" id="eqOpt1" value="${esc(q.options[1] || '')}">
+        <input type="text" class="input" id="eqOpt2" value="${esc(q.options[2] || '')}">
+        <input type="text" class="input" id="eqOpt3" value="${esc(q.options[3] || '')}">
+      </div>
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#8A8880;margin-bottom:6px">Correct Answer</label>
+      <select class="input" id="eqCorrectMC">
+        <option value="0" ${q.correct===0?'selected':''}>A</option>
+        <option value="1" ${q.correct===1?'selected':''}>B</option>
+        <option value="2" ${q.correct===2?'selected':''}>C</option>
+        <option value="3" ${q.correct===3?'selected':''}>D</option>
+      </select>
+    </div>` : ''}
+    ${isJournal ? `
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#8A8880;margin-bottom:8px">Correct Journal Entry</label>
+      <div id="modalJournalRows"></div>
+      <button onclick="addModalJournalRow()" class="je-add-row">+ Add Row</button>
+    </div>` : ''}
+    ${isFitb ? `
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#8A8880;margin-bottom:6px">Correct Answer</label>
+      <input type="text" class="input" id="eqCorrectFitb" value="${esc(String(q.correct))}">
+    </div>
+    <div style="margin-bottom:12px">
+      <label style="display:block;font-size:13px;font-weight:600;color:#8A8880;margin-bottom:6px">Also Accept (optional, comma-separated)</label>
+      <input type="text" class="input" id="eqAltAnswers" value="${esc((q.altAnswers || []).join(', '))}">
+      <p style="font-size:11px;color:#8A8880;margin:6px 0 0">Answers are not case-sensitive.</p>
+    </div>` : ''}
+    <div style="display:grid;gap:10px">
+      <button class="btn-primary" onclick="saveEditQuestion(${idx})">Save Changes</button>
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  `);
+  setTimeout(() => {
+    updatePreview('eqQuestion', 'eqPreview');
+    if (isJournal) renderModalJournalRows();
+  }, 50);
+}
+
+function saveEditQuestion(idx) {
+  const cls = getCurrentClass();
+  const q = cls.questions[idx];
+  
+  q.chapter = parseInt(document.getElementById('eqChapter').value) || 1;
+  q.question = document.getElementById('eqQuestion').value.trim();
+  
+  if (q.type === 'mc') {
+    q.options = [
+      document.getElementById('eqOpt0').value.trim(),
+      document.getElementById('eqOpt1').value.trim(),
+      document.getElementById('eqOpt2').value.trim(),
+      document.getElementById('eqOpt3').value.trim()
+    ].filter(o => o);
+    q.correct = parseInt(document.getElementById('eqCorrectMC').value);
+  } else if (q.type === 'journal') {
+    const entries = modalJournalEntries.filter(e => e.account.trim());
+    q.journalEntries = entries.map(e => ({ account: e.account.trim(), debit: parseMoney(e.debit), credit: parseMoney(e.credit) }));
+  } else {
+    q.correct = document.getElementById('eqCorrectFitb').value.trim();
+    const alts = document.getElementById('eqAltAnswers').value.trim();
+    q.altAnswers = alts ? alts.split(',').map(a => a.trim()).filter(a => a) : [];
+  }
+  
+  saveClasses();
+  closeModal();
+  renderManageQuestions();
+}
+
+function deleteQuestion(idx) {
+  if (!confirm('Delete this question?')) return;
+  const cls = getCurrentClass();
+  cls.questions.splice(idx, 1);
+  saveClasses();
+  renderManageQuestions();
+}
+
+function exportClassQuestions() {
+  const cls = getCurrentClass();
+  const blob = new Blob([JSON.stringify(cls.questions, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = cls.name.replace(/[^a-zA-Z0-9]/g, '_') + '_questions.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function showBulkImportModal() {
+  showModal(`
+    <h3>Bulk Import Questions</h3>
+    <p style="color:#8A8880;font-size:13px;margin:0 0 12px;line-height:1.5">Paste a JSON array of question objects. Each question needs: <code style="color:#3B6BAA">id</code>, <code style="color:#3B6BAA">chapter</code>, <code style="color:#3B6BAA">question</code>, <code style="color:#3B6BAA">type</code> ("mc", "fitb", or "journal"), <code style="color:#3B6BAA">correct</code>, and <code style="color:#3B6BAA">options</code> (for mc).</p>
+    <div style="margin-bottom:16px">
+      <textarea class="input" id="bulkJson" rows="10" placeholder='[{"id":"q1","chapter":1,"question":"...","options":["A","B","C","D"],"correct":0,"type":"mc"}]' style="font-family:'JetBrains Mono',monospace;font-size:12px"></textarea>
+    </div>
+    <div style="display:grid;gap:10px">
+      <button class="btn-primary" onclick="bulkImportQuestions()">Import</button>
+      <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+    </div>
+  `);
+}
+
+function bulkImportQuestions() {
+  try {
+    const data = JSON.parse(document.getElementById('bulkJson').value);
+    if (!Array.isArray(data)) throw new Error('Must be an array');
+    
+    const cls = getCurrentClass();
+    const existingIds = new Set((cls.questions || []).map(q => q.id));
+    let count = 0;
+    data.forEach(q => {
+      if (q.question && q.type) {
+        // Always generate a unique ID to avoid duplicates
+        let newId = 'q_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+        while (existingIds.has(newId)) {
+          newId = 'q_' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+        }
+        q.id = newId;
+        existingIds.add(newId);
+        if (!q.chapter) q.chapter = 1;
+        cls.questions.push(q);
+        count++;
+      }
+    });
+    
+    saveClasses();
+    closeModal();
+    alert(`Imported ${count} questions!`);
+    renderManageQuestions();
+  } catch (err) {
+    alert('Invalid JSON. Please check your format and try again.\n\nError: ' + err.message);
+  }
+}
+
+/* ══════════════════════════════════════
+   RICH TEXT EDITOR HELPERS
+   ══════════════════════════════════════ */
+function rteInsert(textareaId, action) {
+  const ta = document.getElementById(textareaId);
+  if (!ta) return;
+  const start = ta.selectionStart;
+  const end = ta.selectionEnd;
+  const selected = ta.value.substring(start, end);
+  let insert = '';
+  let cursorOffset = 0;
+
+  switch(action) {
+    case 'bold':
+      insert = `<strong>${selected || 'text'}</strong>`;
+      if (!selected) cursorOffset = -9; // before </strong>
+      break;
+    case 'italic':
+      insert = `<em>${selected || 'text'}</em>`;
+      if (!selected) cursorOffset = -5;
+      break;
+    case 'underline':
+      insert = `<u>${selected || 'text'}</u>`;
+      if (!selected) cursorOffset = -4;
+      break;
+    case 'br':
+      insert = '<br>';
+      break;
+    case 'spacer':
+      insert = '<br><br>';
+      break;
+    case 'numberedList':
+      const lines = selected ? selected.split('\n') : ['Item 1', 'Item 2', 'Item 3'];
+      insert = lines.map((line, i) => `(${i+1}) &nbsp;&nbsp;${line.trim()}`).join('<br><br>');
+      break;
+  }
+
+  ta.value = ta.value.substring(0, start) + insert + ta.value.substring(end);
+  ta.focus();
+  const newPos = start + insert.length + cursorOffset;
+  ta.selectionStart = ta.selectionEnd = newPos;
+  
+  // Trigger preview update
+  const previewId = textareaId === 'qQuestion' ? 'qPreview' : 'eqPreview';
+  updatePreview(textareaId, previewId);
+}
+
+function updatePreview(textareaId, previewId) {
+  const ta = document.getElementById(textareaId);
+  const preview = document.getElementById(previewId);
+  if (!ta || !preview) return;
+  preview.innerHTML = ta.value || '';
+}
+
+// Table builder state
+let tableBuilderTarget = null;
+let tableBuilderRows = [['', '']];
+
+function showTableBuilder(textareaId) {
+  tableBuilderTarget = textareaId;
+  tableBuilderRows = [['', ''], ['', ''], ['', '']];
+  renderTableBuilderOverlay();
+}
+
+function renderTableBuilderOverlay() {
+  let rowsHtml = '';
+  tableBuilderRows.forEach((row, i) => {
+    rowsHtml += `
+      <div class="table-builder-row">
+        <input type="text" class="input" style="font-size:12px;padding:8px 10px" placeholder="Label" value="${esc(row[0])}" oninput="tableBuilderRows[${i}][0]=this.value">
+        <input type="text" class="input" style="font-size:12px;padding:8px 10px;max-width:120px;text-align:right" placeholder="Value" value="${esc(row[1])}" oninput="tableBuilderRows[${i}][1]=this.value">
+        ${tableBuilderRows.length > 1 ? `<button onclick="removeTableRow(${i})" style="padding:6px 10px;border:1px solid rgba(184,64,64,0.25);background:rgba(184,64,64,0.06);color:#B84040;border-radius:6px;cursor:pointer;font-size:12px;white-space:nowrap">✕</button>` : ''}
+      </div>`;
+  });
+
+  // Create a secondary overlay on top of the existing modal
+  let overlay = document.getElementById('tableBuilderOverlay');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'tableBuilderOverlay';
+    document.body.appendChild(overlay);
+  }
+  overlay.innerHTML = `
+    <div class="modal-overlay" style="z-index:200" onclick="if(event.target===this)closeTableBuilder()">
+      <div class="modal">
+        <button onclick="closeTableBuilder()" style="position:sticky;top:0;float:right;background:none;border:none;color:#8A8880;font-size:20px;cursor:pointer;padding:0 0 8px 8px;line-height:1;z-index:1" title="Close (Esc)">✕</button>
+        <div style="clear:both"></div>
+        <h3>Insert Table</h3>
+        <p style="color:#8A8880;font-size:13px;margin:0 0 16px">Build a data table — great for cost breakdowns, financial data, etc.</p>
+        <div style="margin-bottom:12px">
+          <div style="display:flex;gap:6px;margin-bottom:8px">
+            <div style="flex:1;font-size:11px;font-weight:700;color:#8A8880;text-transform:uppercase;letter-spacing:0.5px;padding-left:2px">Label</div>
+            <div style="max-width:120px;width:100%;font-size:11px;font-weight:700;color:#8A8880;text-transform:uppercase;letter-spacing:0.5px;text-align:right;padding-right:2px">Value</div>
+            ${tableBuilderRows.length > 1 ? '<div style="width:34px"></div>' : ''}
+          </div>
+          ${rowsHtml}
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <button onclick="addTableRow()" style="flex:1;padding:10px;border-radius:0;border:1px solid rgba(58,125,92,0.3);background:rgba(58,125,92,0.08);color:#3A7D5C;font-size:12px;font-weight:600;cursor:pointer;font-family:'Source Sans 3',sans-serif">+ Add Row</button>
+          <button onclick="addTableTotalRow()" style="flex:1;padding:10px;border-radius:0;border:1px solid rgba(59,107,170,0.3);background:rgba(59,107,170,0.08);color:#3B6BAA;font-size:12px;font-weight:600;cursor:pointer;font-family:'Source Sans 3',sans-serif">+ Total Row</button>
+        </div>
+        <div style="margin-bottom:16px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:#555550">
+            <input type="checkbox" id="tableShowTotal" style="accent-color:#4a7aff"> Show total line (border above last row)
+          </label>
+        </div>
+        <div style="display:grid;gap:10px">
+          <button class="btn-primary" onclick="insertTable()">Insert Table</button>
+          <button class="btn-secondary" onclick="closeTableBuilder()">Cancel</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function closeTableBuilder() {
+  const overlay = document.getElementById('tableBuilderOverlay');
+  if (overlay) overlay.innerHTML = '';
+}
+
+function addTableRow() {
+  tableBuilderRows.push(['', '']);
+  renderTableBuilderOverlay();
+}
+
+function addTableTotalRow() {
+  tableBuilderRows.push(['Total', '']);
+  renderTableBuilderOverlay();
+  setTimeout(() => { const cb = document.getElementById('tableShowTotal'); if (cb) cb.checked = true; }, 50);
+}
+
+function removeTableRow(idx) {
+  tableBuilderRows.splice(idx, 1);
+  renderTableBuilderOverlay();
+}
+
+function insertTable() {
+  const showTotal = document.getElementById('tableShowTotal')?.checked;
+  const rows = tableBuilderRows.filter(r => r[0] || r[1]);
+  if (rows.length === 0) { alert('Please add at least one row'); return; }
+  
+  let tableHtml = "<table style='width:100%;max-width:400px;border-collapse:collapse;margin:10px 0;font-family:inherit'>";
+  rows.forEach((row, i) => {
+    const isLast = i === rows.length - 1;
+    const borderStyle = (showTotal && isLast) ? "border-top:1px solid rgba(255,255,255,0.2);" : "";
+    tableHtml += `<tr><td style='padding:4px 0;${borderStyle}'>${row[0]}</td><td style='padding:4px 0;text-align:right;${borderStyle}'>${row[1]}</td></tr>`;
+  });
+  tableHtml += "</table>";
+  
+  const ta = document.getElementById(tableBuilderTarget);
+  if (ta) {
+    const start = ta.selectionStart || ta.value.length;
+    ta.value = ta.value.substring(0, start) + tableHtml + ta.value.substring(ta.selectionEnd || ta.value.length);
+    
+    // Update preview
+    const previewId = tableBuilderTarget === 'qQuestion' ? 'qPreview' : 'eqPreview';
+    updatePreview(tableBuilderTarget, previewId);
+  }
+  
+  closeTableBuilder();
+}
+
+/* ══════════════════════════════════════
+   QUIZ BUILDER
+   ══════════════════════════════════════ */
+function openQuizBuilder() {
+  quizChapters = [];
+  quizNewOnly = false;
+  renderQuizBuilder();
+  showScreen("quiz-builder");
+  const cls = getCurrentClass();
+  updateHeader(true, `openClass('${currentClassId}')`);
+}
+
+function toggleChapter(ch) {
+  const idx = quizChapters.indexOf(ch);
+  if (idx > -1) quizChapters.splice(idx,1);
+  else quizChapters.push(ch);
+  renderQuizBuilder();
+}
+
+function toggleAllChapters() {
+  const chapters = getChapters(getCurrentQuestions());
+  if (quizChapters.length === chapters.length) quizChapters = [];
+  else quizChapters = [...chapters];
+  renderQuizBuilder();
+}
+
+function renderQuizBuilder() {
+  const allQ = getCurrentQuestions();
+  const chapters = getChapters(allQ);
+  const allSelected = quizChapters.length === chapters.length;
+  const partial = quizChapters.length > 0 && !allSelected;
+  const chapterFiltered = allQ.filter(q => quizChapters.length === 0 || quizChapters.includes(q.chapter));
+
+  // Apply new-only filter — cross-reference studied IDs with actual question IDs
+  const progress = getProgress(currentClassId);
+  const qIds = new Set(allQ.map(q => q.id));
+  const studied = new Set((progress.studied || []).filter(id => qIds.has(id)));
+  const newCount = chapterFiltered.filter(q => !studied.has(q.id)).length;
+  const studiedCount = chapterFiltered.length - newCount;
+
+  let html = `
+    <h2 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:800;margin:0 0 4px">Custom Quiz</h2>
+    <p style="color:#8A8880;font-size:14px;margin:0 0 24px">Select chapters and question count</p>
+    
+    <div style="background:#FFFFFF;border:1px solid #E5E0D5;border-radius:0;padding:18px 20px;margin-bottom:20px">
+      <button onclick="toggleAllChapters()" style="display:flex;align-items:center;gap:12px;width:100%;padding:0;border:none;background:none;color:#1A1A1A;cursor:pointer;font-family:'Source Sans 3',sans-serif;font-size:15px;font-weight:600;margin-bottom:12px">
+        <div class="checkbox ${allSelected ? 'checked' : partial ? 'partial' : ''}">${allSelected ? '✓' : partial ? '−' : ''}</div>
+        Select All Chapters
+      </button>
+      <div style="display:grid;gap:8px">`;
+
+  chapters.forEach(ch => {
+    const sel = quizChapters.includes(ch);
+    const count = allQ.filter(q => q.chapter === ch).length;
+    html += `
+      <button onclick="toggleChapter(${ch})" style="display:flex;align-items:center;gap:12px;width:100%;padding:8px;border:none;background:${sel ? 'rgba(26,26,26,0.06)' : 'transparent'};border-radius:0;color:#1A1A1A;cursor:pointer;font-family:'Source Sans 3',sans-serif;font-size:14px;text-align:left">
+        <div class="checkbox ${sel ? 'checked' : ''}">${sel ? '✓' : ''}</div>
+        <div style="flex:1">Chapter ${ch}</div>
+        <div class="mono" style="font-size:12px;color:#8A8880">${count}</div>
+      </button>`;
+  });
+
+  html += `
+      </div>
+    </div>
+
+    <div style="background:#FFFFFF;border:1px solid #E5E0D5;border-radius:0;padding:18px 20px;margin-bottom:20px">
+      <label style="display:block;font-size:14px;font-weight:600;margin-bottom:12px">Question Pool</label>
+      <button onclick="quizNewOnly=!quizNewOnly;renderQuizBuilder()" style="display:flex;align-items:center;gap:12px;width:100%;padding:10px 12px;border-radius:0;border:1px solid ${quizNewOnly ? 'rgba(58,125,92,0.4)' : '#E5E0D5'};background:${quizNewOnly ? 'rgba(58,125,92,0.1)' : '#FFFFFF'};cursor:pointer;font-family:'Source Sans 3',sans-serif;text-align:left;transition:all 0.15s">
+        <div class="checkbox ${quizNewOnly ? 'checked' : ''}" style="${quizNewOnly ? 'border-color:#3A7D5C;background:#3A7D5C' : ''}">${quizNewOnly ? '✓' : ''}</div>
+        <div style="flex:1">
+          <div style="font-size:14px;font-weight:600;color:${quizNewOnly ? '#3A7D5C' : '#1A1A1A'}">New Questions Only</div>
+          <div style="font-size:12px;color:${quizNewOnly ? '#4aa088' : '#666'};margin-top:2px">Skip questions you've already practiced</div>
+        </div>
+        <div style="text-align:right">
+          <div class="mono" style="font-size:13px;font-weight:700;color:${quizNewOnly ? '#3A7D5C' : '#3B6BAA'}">${newCount} new</div>
+          <div class="mono" style="font-size:11px;color:#8A8880">${studiedCount} studied</div>
+        </div>
+      </button>
+      ${quizNewOnly && newCount === 0 ? `<div style="margin-top:10px;padding:10px 14px;background:rgba(196,93,62,0.1);border:1px solid rgba(196,93,62,0.25);border-radius:0;font-size:12px;color:#C45D3E">⚠️ No new questions available. The quiz will use studied questions instead.</div>` : quizNewOnly && newCount > 0 && newCount < 5 ? `<div style="margin-top:10px;padding:10px 14px;background:rgba(59,107,170,0.08);border:1px solid rgba(59,107,170,0.3);border-radius:0;font-size:12px;color:#3B6BAA">ℹ️ Only ${newCount} new question${newCount !== 1 ? 's' : ''} available. Studied questions will be added to fill the quiz.</div>` : ''}
+    </div>
+    
+    <div style="background:#FFFFFF;border:1px solid #E5E0D5;border-radius:0;padding:18px 20px;margin-bottom:20px">
+      <label style="display:block;font-size:14px;font-weight:600;margin-bottom:12px">Number of Questions</label>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px">`;
+
+  const availableCount = chapterFiltered.length;
+  [5,10,15,20,25].forEach(n => {
+    const disabled = n > availableCount;
+    html += `<button onclick="${disabled ? '' : `quizCount=${n};renderQuizBuilder()`}" class="btn-${quizCount === n ? 'primary' : 'secondary'} ${disabled ? 'btn-disabled' : ''}" style="padding:12px;font-size:14px">${n}</button>`;
+  });
+
+  const effectiveCount = Math.min(quizCount, availableCount);
+  html += `
+      </div>
+      <button onclick="quizCount=${availableCount};renderQuizBuilder()" class="btn-${quizCount === availableCount ? 'primary' : 'secondary'}" style="padding:12px;font-size:14px">All (${availableCount})</button>
+    </div>
+    
+    <button class="btn-primary" onclick="startTest('custom')" ${availableCount === 0 ? 'disabled' : ''}>Start Quiz (${effectiveCount} questions)</button>
+    <button class="btn-secondary" style="margin-top:12px" onclick="openClass('${currentClassId}')">Cancel</button>`;
+
+  document.getElementById('quizBuilderContent').innerHTML = html;
+}
+
+/* ══════════════════════════════════════
+   TEST
+   ══════════════════════════════════════ */
+function startTest(mode) {
+  const allQ = getCurrentQuestions();
+  
+  if (mode === "all") {
+    testQuestions = [...allQ].sort(() => Math.random() - 0.5);
+  } else if (mode === "custom") {
+    let pool = allQ.filter(q => quizChapters.length === 0 || quizChapters.includes(q.chapter));
+    if (quizNewOnly) {
+      const progress = getProgress(currentClassId);
+      const qIds = new Set(allQ.map(q => q.id));
+      const studied = new Set((progress.studied || []).filter(id => qIds.has(id)));
+      const newPool = pool.filter(q => !studied.has(q.id)).sort(() => Math.random() - 0.5);
+      const studiedPool = pool.filter(q => studied.has(q.id)).sort(() => Math.random() - 0.5);
+      const target = Math.min(quizCount, pool.length);
+      if (newPool.length >= target) {
+        pool = newPool.slice(0, target);
+      } else {
+        // Take all new questions, backfill with studied
+        const remainder = target - newPool.length;
+        pool = [...newPool, ...studiedPool.slice(0, remainder)];
+      }
+    } else {
+      pool = pool.sort(() => Math.random() - 0.5).slice(0, quizCount);
+    }
+    testQuestions = pool;
+  }
+  testIdx = 0;
+  testSel = null;
+  testTxt = "";
+  testSubmitted = false;
+  testCorrect = false;
+  testDone = false;
+  score = {c:0, t:0};
+  journalRows = [];
+  pendingStudied = new Set();
+  pendingMissed = [];
+  testStartTime = Date.now();
+  questionStartTime = Date.now();
+  questionTimes = [];
+  clearSavedTest(currentClassId);
+  
+  const cls = getCurrentClass();
+  updateHeader(false);
+  document.getElementById('headerRight').innerHTML = `<div style="display:flex;gap:8px"><button class="btn-home" onclick="saveAndExitTest()" style="background:rgba(58,125,92,0.1);border-color:rgba(58,125,92,0.3);color:#3A7D5C">💾 Save</button><button class="btn-home" onclick="if(confirm('Quit test? Progress will be lost.'))openClass('${currentClassId}')">Quit</button></div>`;
+  
+  renderTest();
+  showScreen("test");
+}
+
+function saveAndExitTest() {
+  saveTestState(currentClassId);
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;top:20px;left:50%;transform:translateX(-50%);background:#1A1A1A;border:1px solid rgba(58,125,92,0.35);border-radius:0;padding:12px 20px;color:#3A7D5C;font-size:14px;font-weight:600;z-index:999;font-family:Outfit,sans-serif;animation:fadeIn 0.2s ease';
+  overlay.textContent = '✓ Test saved! You can resume it from the class home.';
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.remove(), 2200);
+  setTimeout(() => openClass(currentClassId), 2300);
+}
+
+function resumeSavedTest() {
+  const state = getSavedTest(currentClassId);
+  if (!state) return;
+  testQuestions = state.testQuestions;
+  testIdx = state.testIdx;
+  testSel = state.testSel;
+  testTxt = state.testTxt;
+  testSubmitted = state.testSubmitted;
+  testCorrect = state.testCorrect;
+  testDone = state.testDone;
+  score = state.score;
+  journalRows = state.journalRows || [];
+  pendingStudied = new Set(state.pendingStudied || []);
+  pendingMissed = state.pendingMissed || [];
+  testStartTime = state.testStartTime || Date.now();
+  questionStartTime = state.questionStartTime || Date.now();
+  questionTimes = state.questionTimes || [];
+  clearSavedTest(currentClassId);
+
+  updateHeader(false);
+  document.getElementById('headerRight').innerHTML = `<div style="display:flex;gap:8px"><button class="btn-home" onclick="saveAndExitTest()" style="background:rgba(58,125,92,0.1);border-color:rgba(58,125,92,0.3);color:#3A7D5C">💾 Save</button><button class="btn-home" onclick="if(confirm('Quit test? Progress will be lost.'))openClass('${currentClassId}')">Quit</button></div>`;
+  renderTest();
+  showScreen("test");
+}
+
+function startMissedTest() {
+  const progress = getProgress(currentClassId);
+  const missed = progress.missed || [];
+  const filtered = analysisCh === "all" ? missed : missed.filter(q => q.chapter === parseInt(analysisCh));
+  testQuestions = [...filtered].sort(() => Math.random() - 0.5);
+  testIdx = 0;
+  testSel = null;
+  testTxt = "";
+  testSubmitted = false;
+  testCorrect = false;
+  testDone = false;
+  score = {c:0, t:0};
+  journalRows = [];
+  pendingStudied = new Set();
+  pendingMissed = [];
+  testStartTime = Date.now();
+  questionStartTime = Date.now();
+  questionTimes = [];
+  
+  const cls = getCurrentClass();
+  updateHeader(false);
+  document.getElementById('headerRight').innerHTML = `<div style="display:flex;gap:8px"><button class="btn-home" onclick="saveAndExitTest()" style="background:rgba(58,125,92,0.1);border-color:rgba(58,125,92,0.3);color:#3A7D5C">💾 Save</button><button class="btn-home" onclick="if(confirm('Quit test?'))openClass('${currentClassId}')">Quit</button></div>`;
+  
+  renderTest();
+  showScreen("test");
+}
+
+function renderTest() {
+  const q = testQuestions[testIdx];
+  const progress_pct = Math.round((testIdx / testQuestions.length) * 100);
+
+  // Track as studied in memory only — committed when test completes
+  pendingStudied.add(q.id);
+
+  let html = `
+    <div style="margin-bottom:20px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span class="mono" style="font-size:13px;color:#8A8880">Question ${testIdx+1} of ${testQuestions.length}</span>
+        <span class="mono" style="font-size:13px;color:#8A8880">${progress_pct}%</span>
+      </div>
+      <div style="height:6px;background:#E5E0D5;border-radius:3px;overflow:hidden">
+        <div style="height:100%;background:linear-gradient(90deg,#1A1A1A,#555550);width:${progress_pct}%;transition:width 0.3s"></div>
+      </div>
+    </div>
+    
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      ${chBadge(q.chapter)}
+    </div>
+    
+    <p style="font-size:16px;font-weight:600;line-height:1.5;margin-bottom:24px">${q.question}</p>`;
+
+  if (q.type === "mc") {
+    html += '<div style="display:grid;gap:10px">';
+    q.options.forEach((opt,i) => {
+      const selected = testSel === i;
+      let bg = '#FFFFFF';
+      let bd = '#E5E0D5';
+      let color = '#1A1A1A';
+      let letterColor = '#8A8880';
+      
+      if (testSubmitted) {
+        if (i === q.correct) { bg = 'rgba(58,125,92,0.1)'; bd = 'rgba(58,125,92,0.4)'; color = '#2D5F44'; letterColor = '#3A7D5C'; }
+        else if (selected && i !== q.correct) { bg = 'rgba(184,64,64,0.08)'; bd = 'rgba(184,64,64,0.35)'; color = '#8B3030'; letterColor = '#B84040'; }
+        else { color = '#8A8880'; letterColor = '#C8C0B2'; }
+      } else if (selected) { bg = 'rgba(26,26,26,0.06)'; bd = '#1A1A1A'; letterColor = '#1A1A1A'; }
+
+      html += `
+        <button onclick="${testSubmitted ? '' : `selectAnswer(${i})`}" class="card-btn" style="background:${bg};border:1px solid ${bd};padding:14px 18px;display:flex;align-items:center;gap:12px;${testSubmitted ? 'cursor:default' : ''}">
+          <div class="mono" style="font-size:14px;font-weight:700;color:${letterColor}">${LETTERS[i]}</div>
+          <div style="font-size:14px;color:${color};text-align:left">${esc(opt)}</div>
+        </button>`;
+    });
+    html += '</div>';
+  } else if (q.type === "journal") {
+    // Journal entry interactive input
+    if (journalRows.length === 0) {
+      journalRows = [{account:'',debit:'',credit:''},{account:'',debit:'',credit:''},{account:'',debit:'',credit:''}];
+    }
+    html += renderJournalTestUI(q);
+  } else {
+    // Fill in the blank (also handles legacy "numeric" type)
+    let bg = '#FFFFFF';
+    let bd = '#E5E0D5';
+    if (testSubmitted) {
+      if (testCorrect) { bg = 'rgba(58,125,92,0.1)'; bd = 'rgba(58,125,92,0.4)'; }
+      else { bg = 'rgba(184,64,64,0.08)'; bd = 'rgba(184,64,64,0.35)'; }
+    }
+    html += `<input type="text" class="input" id="numInput" value="${testTxt}" oninput="testTxt=this.value" ${testSubmitted ? 'disabled' : ''} placeholder="Type your answer..." style="background:${bg};border-color:${bd}">`;
+    if (testSubmitted && !testCorrect) {
+      html += `<div style="margin-top:12px;padding:12px;background:rgba(58,125,92,0.08);border:1px solid rgba(58,125,92,0.3);border-radius:0;font-size:14px;color:#3A7D5C">Correct answer: ${esc(String(q.correct))}</div>`;
+    }
+  }
+
+  html += '<div style="margin-top:24px;display:grid;gap:12px">';
+  if (!testSubmitted) {
+    html += `<button class="btn-primary" onclick="submitAnswer()">Submit Answer</button>`;
+  } else {
+    html += `<button class="btn-primary" onclick="nextQuestion()">${testIdx + 1 >= testQuestions.length ? 'View Results' : 'Next Question'}</button>`;
+  }
+  html += '</div>';
+
+  document.getElementById('testContent').innerHTML = html;
+  if ((q.type === "fitb" || q.type === "numeric") && !testSubmitted) {
+    setTimeout(() => document.getElementById('numInput')?.focus(), 100);
+  }
+}
+
+function renderJournalTestUI(q) {
+  let totalDebit = 0, totalCredit = 0;
+  journalRows.forEach(r => { totalDebit += parseMoney(r.debit); totalCredit += parseMoney(r.credit); });
+  const balanced = totalDebit > 0 && totalDebit === totalCredit;
+  const hasEntries = totalDebit > 0 || totalCredit > 0;
+
+  let h = `<div class="journal-wrap"><div class="journal-header"><span style="font-size:14px">📒</span><span class="journal-header-label">General Journal</span></div>`;
+  h += `<div style="overflow-x:auto"><table class="je-table"><thead><tr><th>Account</th><th class="je-num">Debit</th><th class="je-num">Credit</th>${!testSubmitted?'<th style="width:30px"></th>':''}</tr></thead><tbody>`;
+
+  if (!testSubmitted) {
+    journalRows.forEach((row, i) => {
+      const isCredit = parseMoney(row.credit) > 0 && !parseMoney(row.debit);
+      h += `<tr>
+        <td><input class="je-input${isCredit?' je-input-credit':''}" value="${esc(row.account)}" placeholder="${i===0?'e.g. Bad Debt Expense':'Account name'}" oninput="journalRows[${i}].account=this.value" ${testSubmitted?'disabled':''}></td>
+        <td><input class="je-input je-input-num" value="${esc(String(row.debit||''))}" placeholder="" oninput="journalRows[${i}].debit=this.value;journalRows[${i}].credit='';reRenderJournal()" ${testSubmitted?'disabled':''}></td>
+        <td><input class="je-input je-input-num" value="${esc(String(row.credit||''))}" placeholder="" oninput="journalRows[${i}].credit=this.value;journalRows[${i}].debit='';reRenderJournal()" ${testSubmitted?'disabled':''}></td>
+        <td>${journalRows.length>1?`<button onclick="journalRows.splice(${i},1);renderTest()" class="je-remove">✕</button>`:''}</td></tr>`;
+    });
+    // Totals row
+    h += `<tr class="je-totals"><td style="font-weight:700;color:#8A8880">Totals</td>`;
+    h += `<td class="je-num ${hasEntries?(balanced?'je-balanced':'je-unbalanced'):''}" style="font-weight:700">${totalDebit?fmtMoney(totalDebit):''}</td>`;
+    h += `<td class="je-num ${hasEntries?(balanced?'je-balanced':'je-unbalanced'):''}" style="font-weight:700">${totalCredit?fmtMoney(totalCredit):''}</td>`;
+    h += `<td></td></tr>`;
+    h += `</tbody></table></div>`;
+    h += `<button onclick="journalRows.push({account:'',debit:'',credit:''});renderTest()" class="je-add-row">+ Add Row</button>`;
+    if (hasEntries && !balanced) {
+      h += `<div style="margin-top:8px;padding:8px 12px;background:rgba(196,93,62,0.1);border:1px solid rgba(196,93,62,0.25);border-radius:0;font-size:12px;color:#C45D3E">⚠️ Debits and credits don't balance</div>`;
+    }
+  } else {
+    // Show graded results
+    const correct = q.journalEntries || [];
+    const userEntries = journalRows.filter(r => r.account.trim());
+    
+    // Show user's entries with grading
+    userEntries.forEach(row => {
+      const matchIdx = correct.findIndex(c => 
+        c.account.toLowerCase().trim() === row.account.toLowerCase().trim() &&
+        parseMoney(row.debit) === c.debit && parseMoney(row.credit) === c.credit
+      );
+      const isMatch = matchIdx >= 0;
+      const isCredit = parseMoney(row.credit) > 0 && !parseMoney(row.debit);
+      const rowClass = isMatch ? 'je-row-correct' : 'je-row-incorrect';
+      h += `<tr class="${rowClass}">
+        <td style="${isCredit?'padding-left:20px':''}">${isMatch?'✅':'❌'} ${esc(row.account)}</td>
+        <td class="je-num" style="font-family:'JetBrains Mono',monospace">${parseMoney(row.debit)?fmtMoney(parseMoney(row.debit)):''}</td>
+        <td class="je-num" style="font-family:'JetBrains Mono',monospace">${parseMoney(row.credit)?fmtMoney(parseMoney(row.credit)):''}</td></tr>`;
+    });
+    h += `</tbody></table></div>`;
+
+    // Show correct answer
+    if (!testCorrect) {
+      h += `<div style="margin-top:16px;padding:14px;background:rgba(58,125,92,0.08);border:1px solid rgba(58,125,92,0.3);border-radius:0">
+        <div style="font-size:12px;font-weight:700;color:#3A7D5C;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Correct Journal Entry:</div>
+        <table class="je-result"><thead><tr><th>Account</th><th class="je-num">Debit</th><th class="je-num">Credit</th></tr></thead><tbody>`;
+      correct.forEach(e => {
+        const isCr = e.credit > 0 && !e.debit;
+        h += `<tr${isCr?' class="je-cr"':''}><td>${esc(e.account)}</td><td class="je-num">${e.debit?fmtMoney(e.debit):''}</td><td class="je-num">${e.credit?fmtMoney(e.credit):''}</td></tr>`;
+      });
+      h += `</tbody></table></div>`;
+    }
+  }
+  h += `</div>`;
+  return h;
+}
+
+function reRenderJournal() {
+  // Lightweight re-render just for the balance indicator — full renderTest would lose focus
+  // We'll just let it be and re-render on submit
+}
+
+function selectAnswer(i) {
+  testSel = i;
+  renderTest();
+}
+
+function submitAnswer() {
+  if (testSubmitted) return;
+  const q = testQuestions[testIdx];
+
+  // Read latest value from input in case oninput didn't fire
+  const numInput = document.getElementById('numInput');
+  if (numInput) testTxt = numInput.value;
+
+  // Validate something is entered
+  if (q.type === "mc" && testSel === null) return;
+  if (q.type === "journal" && !journalRows.some(r => r.account.trim())) return;
+  if (q.type !== "mc" && q.type !== "journal" && testTxt.trim() === "") return;
+
+  let correct = false;
+
+  if (q.type === "mc") {
+    correct = testSel === q.correct;
+  } else if (q.type === "journal") {
+    // Grade journal entry: check that all correct entries are present and amounts match
+    const correctEntries = q.journalEntries || [];
+    const userEntries = journalRows.filter(r => r.account.trim());
+    
+    if (userEntries.length === correctEntries.length) {
+      // Check each correct entry has a matching user entry
+      const usedIndices = new Set();
+      let allMatch = true;
+      correctEntries.forEach(ce => {
+        const matchIdx = userEntries.findIndex((ue, i) => 
+          !usedIndices.has(i) &&
+          ue.account.toLowerCase().trim() === ce.account.toLowerCase().trim() &&
+          parseMoney(ue.debit) === ce.debit &&
+          parseMoney(ue.credit) === ce.credit
+        );
+        if (matchIdx >= 0) {
+          usedIndices.add(matchIdx);
+        } else {
+          allMatch = false;
+        }
+      });
+      correct = allMatch;
+    }
+  } else {
+    const userAns = testTxt.trim().toLowerCase().replace(/[,$]/g, '');
+    const correctAns = String(q.correct).trim().toLowerCase().replace(/[,$]/g, '');
+    const altAnswers = (q.altAnswers || []).map(a => a.trim().toLowerCase().replace(/[,$]/g, ''));
+    correct = userAns === correctAns || altAnswers.includes(userAns);
+  }
+
+  testSubmitted = true;
+  testCorrect = correct;
+  score.t++;
+
+  // Record time spent on this question
+  const qTime = Date.now() - questionStartTime;
+  questionTimes.push(qTime);
+  
+  if (correct) {
+    score.c++;
+  } else {
+    // Defer missed tracking — only committed when the test is fully completed
+    const existing = pendingMissed.find(m => m.id === q.id);
+    if (existing) {
+      existing.count = (existing.count || 1) + 1;
+    } else {
+      pendingMissed.push({...q, count:1});
+    }
+  }
+
+  renderTest();
+}
+
+function nextQuestion() {
+  if (testIdx + 1 >= testQuestions.length) {
+    testDone = true;
+    renderResults();
+    showScreen("results");
+  } else {
+    testIdx++;
+    testSel = null;
+    testTxt = "";
+    testSubmitted = false;
+    testCorrect = false;
+    journalRows = [];
+    questionStartTime = Date.now();
+    renderTest();
+  }
+}
+
+// Keyboard Enter support
+document.addEventListener("keydown", function(e) {
+  if (currentScreen !== "test") return;
+  if (e.key === "Enter") {
+    if (testSubmitted && !testDone) nextQuestion();
+    else if (!testSubmitted) submitAnswer();
+  }
+});
+
+/* ══════════════════════════════════════
+   RESULTS
+   ══════════════════════════════════════ */
+function fmtTime(ms) {
+  const totalSec = Math.round(ms / 1000);
+  if (totalSec < 60) return totalSec + 's';
+  const min = Math.floor(totalSec / 60);
+  const sec = totalSec % 60;
+  return min + 'm ' + (sec < 10 ? '0' : '') + sec + 's';
+}
+
+function renderResults() {
+  const cls = getCurrentClass();
+  const color = getClassColor(cls);
+  updateHeader(true, `openClass('${currentClassId}')`);
+  clearSavedTest(currentClassId);
+
+  // Commit studied questions now that the test is fully complete
+  const progress = getProgress(currentClassId);
+  const studied = new Set(progress.studied || []);
+  pendingStudied.forEach(id => studied.add(id));
+  progress.studied = Array.from(studied);
+
+  // Commit missed questions now that the test is fully complete
+  const missed = progress.missed || [];
+  pendingMissed.forEach(pm => {
+    const existing = missed.find(m => m.id === pm.id);
+    if (existing) {
+      existing.count = (existing.count || 1) + (pm.count || 1);
+    } else {
+      missed.push({...pm});
+    }
+  });
+  progress.missed = missed;
+
+  saveProgress(currentClassId, progress);
+  pendingStudied = new Set();
+  pendingMissed = [];
+  
+  const pct = score.t > 0 ? Math.round(score.c / score.t * 100) : 0;
+  const ringBg = pct >= 80 ? "rgba(58,125,92,0.12)" : pct >= 60 ? "rgba(184,134,11,0.12)" : "rgba(184,64,64,0.1)";
+  const ringBd = pct >= 80 ? "2px solid rgba(58,125,92,0.4)" : pct >= 60 ? "2px solid rgba(184,134,11,0.4)" : "2px solid rgba(184,64,64,0.35)";
+  const ringC = pct >= 80 ? "#3A7D5C" : pct >= 60 ? "#B8860B" : "#B84040";
+  const msg = pct >= 90 ? "Excellent!" : pct >= 80 ? "Great Job!" : pct >= 70 ? "Good Work!" : pct >= 60 ? "Keep Studying!" : "Let's Review!";
+
+  // Timing calculations
+  const totalTime = testStartTime ? Date.now() - testStartTime : 0;
+  const totalAnswerTime = questionTimes.reduce((a, b) => a + b, 0);
+  const avgTime = questionTimes.length > 0 ? totalAnswerTime / questionTimes.length : 0;
+  const fastestTime = questionTimes.length > 0 ? Math.min(...questionTimes) : 0;
+  const slowestTime = questionTimes.length > 0 ? Math.max(...questionTimes) : 0;
+
+  const missedCount = (progress.missed || []).length;
+
+  let html = `
+    <div style="text-align:center;margin-top:40px">
+      <div style="width:100px;height:100px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;background:${ringBg};border:${ringBd}">
+        <span class="mono" style="font-size:32px;font-weight:900;color:${ringC}">${pct}%</span>
+      </div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:800;margin:0 0 8px">${msg}</h2>
+      <p style="color:#8A8880;font-size:15px;margin:0 0 24px">You got <strong style="color:#1A1A1A">${score.c}</strong> out of <strong style="color:#1A1A1A">${score.t}</strong> correct</p>
+
+      <div style="background:#FFFFFF;border:1px solid #E5E0D5;padding:20px 24px;margin:0 0 32px;text-align:left">
+        <h3 style="font-size:13px;font-weight:700;color:#8A8880;text-transform:uppercase;letter-spacing:1px;margin:0 0 14px">Time</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px 24px">
+          <div>
+            <div class="mono" style="font-size:22px;font-weight:700;color:#1A1A1A">${fmtTime(totalTime)}</div>
+            <div style="font-size:12px;color:#8A8880;margin-top:2px">Total time</div>
+          </div>
+          <div>
+            <div class="mono" style="font-size:22px;font-weight:700;color:#1A1A1A">${fmtTime(avgTime)}</div>
+            <div style="font-size:12px;color:#8A8880;margin-top:2px">Avg per question</div>
+          </div>
+          <div>
+            <div class="mono" style="font-size:16px;font-weight:700;color:#3A7D5C">${fmtTime(fastestTime)}</div>
+            <div style="font-size:12px;color:#8A8880;margin-top:2px">Fastest</div>
+          </div>
+          <div>
+            <div class="mono" style="font-size:16px;font-weight:700;color:#C45D3E">${fmtTime(slowestTime)}</div>
+            <div style="font-size:12px;color:#8A8880;margin-top:2px">Slowest</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;gap:12px">
+        <button class="btn-primary" onclick="openQuizBuilder()">New Quiz</button>
+        ${missedCount > 0 ? `<button onclick="openAnalysis()" style="width:100%;padding:16px;border-radius:0;border:1px solid rgba(196,93,62,0.3);background:rgba(196,93,62,0.08);color:#C45D3E;font-size:15px;font-weight:700;cursor:pointer;font-family:'Source Sans 3',sans-serif">View Analysis (${missedCount} missed)</button>` : ''}
+        <button class="btn-secondary" onclick="openClass('${currentClassId}')">Back to Class</button>
+      </div>
+    </div>`;
+
+  document.getElementById('resultsContent').innerHTML = html;
+}
+
+/* ══════════════════════════════════════
+   ANALYSIS
+   ══════════════════════════════════════ */
+function openAnalysis() {
+  analysisCh = "all";
+  const cls = getCurrentClass();
+  updateHeader(true, `openClass('${currentClassId}')`);
+  renderAnalysis();
+  showScreen("analysis");
+}
+
+function setAnalysisCh(ch) {
+  analysisCh = ch;
+  renderAnalysis();
+}
+
+function renderAnalysis() {
+  const progress = getProgress(currentClassId);
+  const missed = progress.missed || [];
+  const allQ = getCurrentQuestions();
+  const chapters = getChapters(allQ);
+  const filtered = analysisCh === "all" ? missed : missed.filter(q => q.chapter === parseInt(analysisCh));
+
+  let html = `
+    <h2 style="font-family:'Playfair Display',serif;font-size:24px;font-weight:800;margin:0 0 4px">Analysis</h2>
+    <p style="color:#8A8880;font-size:14px;margin:0 0 24px">Questions you've answered incorrectly</p>`;
+
+  if (missed.length === 0) {
+    html += `<div style="text-align:center;padding:60px 20px;background:#FFFFFF;border-radius:0;border:1px solid #E5E0D5"><div style="font-size:40px;margin-bottom:12px">🎉</div><p style="color:#8A8880;font-size:15px;margin:0">No missed questions yet!</p></div>`;
+  } else {
+    // Filter buttons
+    html += `<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">`;
+    ["all", ...chapters].forEach(x => {
+      const active = analysisCh === String(x);
+      html += `<button onclick="setAnalysisCh('${x}')" style="padding:6px 14px;border-radius:0;font-size:12px;font-weight:600;cursor:pointer;font-family:'Source Sans 3',sans-serif;border:${active ? '1px solid #1A1A1A' : '1px solid #E5E0D5'};background:${active ? 'rgba(26,26,26,0.06)' : '#FFFFFF'};color:${active ? '#1A1A1A' : '#8A8880'}">${x === "all" ? "All" : "Ch. " + x}</button>`;
+    });
+    html += `</div>`;
+
+    if (filtered.length > 0) {
+      html += `<button class="btn-primary" style="margin-bottom:20px" onclick="startMissedTest()">Test Missed Questions (${filtered.length})</button>`;
+    }
+
+    html += `<div style="display:grid;gap:12px">`;
+    filtered.forEach(q => {
+      let answerHtml = '';
+      if (q.type === 'journal' && q.journalEntries) {
+        answerHtml = `<table class="je-result" style="margin:0"><thead><tr><th>Account</th><th class="je-num">Debit</th><th class="je-num">Credit</th></tr></thead><tbody>`;
+        q.journalEntries.forEach(e => {
+          const isCr = e.credit > 0 && !e.debit;
+          answerHtml += `<tr${isCr?' class="je-cr"':''}><td>${esc(e.account)}</td><td class="je-num">${e.debit?fmtMoney(e.debit):''}</td><td class="je-num">${e.credit?fmtMoney(e.credit):''}</td></tr>`;
+        });
+        answerHtml += `</tbody></table>`;
+      } else {
+        const answer = q.type === "mc" ? LETTERS[q.correct] + ") " + esc(q.options[q.correct]) : esc(String(q.correct));
+        answerHtml = answer;
+      }
+      html += `
+        <div style="background:#FFFFFF;border:1px solid #E5E0D5;border-radius:0;padding:18px 20px">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+            ${chBadge(q.chapter)}
+            ${q.count > 1 ? `<span class="mono" style="font-size:10px;color:#B84040;background:rgba(184,64,64,0.12);padding:2px 8px;border-radius:4px">missed ${q.count}x</span>` : ''}
+          </div>
+          <p style="font-size:14px;font-weight:600;margin:0 0 10px;line-height:1.45;color:#1A1A1A">${q.question}</p>
+          <div style="font-size:13px;color:#3A7D5C;background:rgba(58,125,92,0.08);padding:8px 12px;border-radius:0;line-height:1.4"><strong>Answer:</strong> ${answerHtml}</div>
+        </div>`;
+    });
+    html += `</div>`;
+
+    html += `<button onclick="clearMissed()" style="margin-top:24px;width:100%;padding:12px;border-radius:0;border:1px solid rgba(184,64,64,0.25);background:rgba(184,64,64,0.06);color:#B84040;font-size:13px;font-weight:600;cursor:pointer;font-family:'Source Sans 3',sans-serif">Clear All Missed Questions</button>`;
+  }
+
+  html += `<button class="btn-secondary" style="margin-top:12px" onclick="openClass('${currentClassId}')">Back to Class</button>`;
+  document.getElementById('analysisContent').innerHTML = html;
+}
+
+function clearMissed() {
+  const progress = getProgress(currentClassId);
+  progress.missed = [];
+  saveProgress(currentClassId, progress);
+  analysisCh = "all";
+  renderAnalysis();
+}
+
+/* ══════════════════════════════════════
+   INIT
+   ══════════════════════════════════════ */
+goToDashboard();
+</script>
+</body>
+</html>

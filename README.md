@@ -1,2 +1,2 @@
-# Mstudyhub.github.io
+# studyhub.github.io
 Farzin's personal Website

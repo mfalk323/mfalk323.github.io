@@ -1,2 +1,2 @@
-# FarzinAhmadi.github.io
+# Mstudyhub.github.io
 Farzin's personal Website
